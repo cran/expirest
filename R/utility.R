@@ -25,7 +25,7 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
   if (!is.numeric(x_new) & !is.na(x_new)) {
     stop("x_new must be a numeric value.")
   }
-  if (class(model) != "lm") {
+  if (!inherits(model, "lm")) {
     stop("Please provide a model of type \"lm\".")
   }
   if (alpha <= 0 | alpha > 1) {
@@ -191,7 +191,7 @@ get_distance <- function(x_new, model, sl, alpha = 0.05, ivl = "confidence",
   if (!is.numeric(x_new)) {
     stop("x_new must be a numeric value.")
   }
-  if (class(model) != "lm") {
+  if (!inherits(model, "lm")) {
     stop("Please provide a model of type \"lm\".")
   }
   if (!is.numeric(sl) | length(sl) > 1) {
@@ -279,7 +279,7 @@ find_poi <- function(srch_range, model, sl, alpha = 0.05, ivl = "confidence",
   if (!is.numeric(srch_range) | length(srch_range) != 2) {
     stop("The parameter srch_range must be a vector of length 2.")
   }
-  if (class(model) != "lm") {
+  if (!inherits(model, "lm")) {
     stop("Please provide a model of type \"lm\".")
   }
   if (!is.numeric(sl) | length(sl) > 1) {
@@ -988,7 +988,7 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 
 get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
                      xform = c("no", "no"), shift = c(0, 0)) {
-  if (class(model) != "lm") {
+  if (!inherits(model, "lm")) {
     stop("Please provide a model of type \"lm\".")
   }
   if (!is.character(response_vbl)) {
@@ -1325,10 +1325,23 @@ print_val <- function(val_name, val_value, val_unit, val_sf,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Formatting of information
 
-  paste(prefix, val_name,
-        formatC(signif(val_value, val_sf), digits = val_sf, format = "fg",
-                flag = "#"),
-        val_unit, suffix, sep = "")
+  if (is.na(val_value)) {
+    paste(prefix, val_name,
+          formatC(signif(val_value, val_sf), digits = val_sf, format = "fg",
+                  flag = "#"),
+          val_unit, suffix, sep = "")
+  } else {
+    if (val_sf <= get_n_whole_part(val_value)) {
+      paste(prefix, val_name,
+            formatC(signif(val_value, val_sf), digits = val_sf, format = "fg"),
+            val_unit, suffix, sep = "")
+    } else {
+      paste(prefix, val_name,
+            formatC(signif(val_value, val_sf), digits = val_sf, format = "fg",
+                    flag = "#"),
+            val_unit, suffix, sep = "")
+    }
+  }
 }
 
 #' Get number of digits of whole part (of a decimal number)

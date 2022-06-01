@@ -1,13 +1,13 @@
-2c87885854b59940ae99777f49ba6a5d *DESCRIPTION
+526667cc08796134a89d4f6afc286b31 *DESCRIPTION
 d76e8d53c7fd199e6132903fa6b06295 *NAMESPACE
-df528e6c0fbf44bb2497ca5c075a782a *NEWS.md
+b3a2312e0e0e1844d97ad8f46755f7f9 *NEWS.md
 09b4659fbdea43ca9c6fd59bcbbed449 *R/data.R
 3e24b6080e617a1ee571ca5a3d0f13e3 *R/error_handling.R
-b0c2de90e5964046a0010462116df7b0 *R/expirest_osle.R
-cd557a9855845b44e454abd0e49b3dcc *R/expirest_wisle.R
+24c4c639799c25cf6c70f7448cbe7049 *R/expirest_osle.R
+888bbcfd854fbcd8eefcae922f2275ec *R/expirest_wisle.R
 2b2245174096473808fcafafd69afe3c *R/generic.R
-810abda97599834cd2e733c729f72395 *R/utility.R
-9408119984a91f25eedda921e306d366 *README.md
+2548ba51c1a2633cd105f9f9c58c42d8 *R/utility.R
+47e9b51a48c87956160390898cfcfb3b *README.md
 4de9ef4b72d50a7a929790fdebde8367 *data/exp1.RData
 9dfe227bf6dac989330e70aabc930c4f *data/exp2.RData
 1cc3009f9001639eafc350f80aa15c52 *data/exp3.RData
@@ -34,7 +34,7 @@ c52ab9466b19a3ece8e9f9767f47e96b *man/exp4.Rd
 e14403cf0eb59992b61404c596066126 *man/extract_from_ll_wcsl.Rd
 359fc3aa9ff2abeb9faeb9bd7193cf44 *man/extract_wc_x.Rd
 971d260ba37614ddf70fbc5be6c3c5f5 *man/figures/README-example_1-1.png
-007d2fdcb24cfd48fcf978155ba7c45e *man/figures/README-example_2-1.png
+97d064a9e7257ba30d6f53a44417f399 *man/figures/README-example_2-1.png
 17cb84b0643a3d1d30f1776d20ba0c2e *man/find_poi.Rd
 60e01d29e6f5322fbc92ac894f558966 *man/get_distance.Rd
 fdda3d85708daf2955c8eec60140a642 *man/get_icpt.Rd
@@ -74,7 +74,7 @@ b4a95952f8a68dc4260791943754b7e7 *tests/testthat/test-get_variable_list.R
 4da67b263e00a85a2fcbc6b500a6e498 *tests/testthat/test-get_wcs_limit.R
 962daa7b9406a4dd58db4cfa85898040 *tests/testthat/test-get_xformed_variables.R
 dae93df326dd49ac4a0680ac57715f3c *tests/testthat/test-plot_expirest_osle.R
-8291ba2de7e37e0742e60506110a4d82 *tests/testthat/test-plot_expirest_wisle.R
+74ec6a16186992c64628b129dac11f4f *tests/testthat/test-plot_expirest_wisle.R
 c35f44ebb071712123dedf6315adefc2 *tests/testthat/test-print_val.R
 9a8a4eba26fc211b4505eacac8732999 *tests/testthat/test-set_limits.R
 02c70cc89e4ded94fc2862014052464a *tests/testthat/test-try_get_model.R

@@ -17,11 +17,14 @@ medicines](https://www.tga.gov.au/stability-testing-prescription-medicines)).
 
 ## Installation
 
-**So far, the package has not yet been submitted to CRAN.** The
-development version is available from
-[GitHub](https://github.com/piusdahinden/expirest). Installation from
-this source is easily done by using `install_github()` function from the
-`devtools` package:
+A stable version of `expirest` can be installed from CRAN:
+
+``` r
+# install.packages("expirest")
+```
+
+The development version is available from
+[GitHub](https://github.com/piusdahinden/expirest) by:
 
 ``` r
 # install.packages("devtools")
@@ -116,7 +119,7 @@ str(exp1)
 res1 <- expirest_wisle(
       data = exp1[exp1$Batch %in% c("b4", "b5", "b8"), ],
       response_vbl = "Potency", time_vbl = "Month", batch_vbl = "Batch",
-      rl = c(98.0, 98.5, 99.), rl_sf = rep(2, 3), sl = 95, sl_sf = 2,
+      rl = c(98.0, 98.5, 99.0), rl_sf = rep(2, 3), sl = 95, sl_sf = 2,
       srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
       xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
       ivl = "confidence", ivl_type = "one.sided", ivl_side = "lower")
