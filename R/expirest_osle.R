@@ -162,8 +162,7 @@
 #' International Council for Harmonisation of Technical Requirements for
 #' Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
-#' (CPMP/ICH/420/02).\cr
-#' \url{https://www.ich.org/page/quality-guidelines}
+#' (CPMP/ICH/420/02).
 #'
 #' @seealso \code{\link{expirest_wisle}}, \code{\link{find_poi}},
 #' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
@@ -208,7 +207,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   if (!is.factor(data[, batch_vbl])) {
     stop("The column in data specified by batch_vbl must be a factor.")
   }
-  if (!is.numeric(sl) | length(sl) > 2) {
+  if (!is.numeric(sl) || length(sl) > 2) {
     stop("The parameter sl must be a numeric or vector of length 1 or 2.")
   }
   if (length(sl) == 2) {
@@ -216,7 +215,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
       stop("The parameter sl must be of the form c(lower, upper).")
     }
   }
-  if (!is.numeric(sl_sf) & all(!is.na(sl_sf))) {
+  if (!is.numeric(sl_sf) && all(!is.na(sl_sf))) {
     stop("The parameter sl_sf must be a positive integer of length sl.")
   }
   if (sum(sl_sf < 0) > 0) {
@@ -228,19 +227,19 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   if (!isTRUE(all.equal(sl_sf, as.integer(sl_sf)))) {
     stop("The parameter sl_sf must be a positive integer of length sl.")
   }
-  if (!is.numeric(srch_range) | length(srch_range) != 2) {
+  if (!is.numeric(srch_range) || length(srch_range) != 2) {
     stop("The parameter srch_range must be a vector of length 2.")
   }
-  if (alpha <= 0 | alpha > 1) {
+  if (alpha <= 0 || alpha > 1) {
     stop("Please specify alpha as (0, 1].")
   }
-  if (alpha_pool <= 0 | alpha_pool > 1) {
+  if (alpha_pool <= 0 || alpha_pool > 1) {
     stop("Please specify alpha_pool as (0, 1].")
   }
   if (length(xform) != 2) {
     stop("Please specify xform appropriately.")
   }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) |
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
@@ -264,26 +263,26 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   }
 
   if (length(sl) == 2) {
-    if (ivl_side == "lower" & sum(data[, response_vbl] < sl[1]) > 0) {
+    if (ivl_side == "lower" && sum(data[, response_vbl] < sl[1]) > 0) {
       warning("You specified ivl_side = \"lower\". But ",
               round(100 / nrow(data) * sum(data[, response_vbl] < sl[1]), 1),
               "% of the response values are < sl[1]. ",
               "Are you sure that you did not want to set ivl_side = \"upper\"?")
     }
-    if (ivl_side == "upper" & sum(data[, response_vbl] > sl[2]) > 0) {
+    if (ivl_side == "upper" && sum(data[, response_vbl] > sl[2]) > 0) {
       warning("You specified ivl_side = \"upper\". But ",
               round(100 / nrow(data) * sum(data[, response_vbl] > sl[2]), 1),
               "% of the response values are > sl[2]. ",
               "Are you sure that you did not want to set ivl_side = \"lower\"?")
     }
   } else {
-    if (ivl_side == "lower" & sum(data[, response_vbl] < sl) > 0) {
+    if (ivl_side == "lower" && sum(data[, response_vbl] < sl) > 0) {
       warning("You specified ivl_side = \"lower\". But ",
               round(100 / nrow(data) * sum(data[, response_vbl] < sl), 1),
               "% of the response values are < sl. ",
               "Are you sure that you did not want to set ivl_side = \"upper\"?")
     }
-    if (ivl_side == "upper" & sum(data[, response_vbl] > sl) > 0) {
+    if (ivl_side == "upper" && sum(data[, response_vbl] > sl) > 0) {
       warning("You specified ivl_side = \"upper\". But ",
               round(100 / nrow(data) * sum(data[, response_vbl] > sl), 1),
               "% of the response values are > sl. ",
@@ -371,8 +370,9 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # Individual
   t_formula <- paste(response_vbl, "~", time_vbl)
   l_models[["individual"]] <-
-    by(data = d_dat, INDICES = d_dat[, batch_vbl], FUN = function(dat)
-    do.call("lm", list(as.formula(t_formula), data = as.name("dat"))))
+    by(data = d_dat, INDICES = d_dat[, batch_vbl], FUN = function(dat) {
+      do.call("lm", list(as.formula(t_formula), data = as.name("dat")))
+    })
 
   # ---------
   # Determination of the Akaike Information Criterion (AIC) and Bayesian
@@ -384,7 +384,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of limits
 
-  if (mrl > 0 & mrlsf > 0) {
+  if (mrl > 0 && mrlsf > 0) {
     l_lim <-
       set_limits(rl = mf[[mrl]], rl_sf = mf[[mrlsf]], sl = sl, sl_sf = sl_sf,
                  sf_option = sf_option, xform = xform, shift = shift,
@@ -430,10 +430,11 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of intercepts of all models
 
-  l_icpt <- vapply(l_models[1:(length(l_models) - 1)], function(x)
+  l_icpt <- vapply(l_models[1:(length(l_models) - 1)], function(x) {
     list(get_icpt(model = x, response_vbl = response_vbl,
                   time_vbl = time_vbl, batch_vbl = batch_vbl,
-                  xform = xform, shift = shift)),
+                  xform = xform, shift = shift))
+    },
     list(1))
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -494,11 +495,12 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   # In case of dids model: wc_batch_ich needs to be determined using the
   #   models fitted to the data of each batch individually.
 
+  wc_batch_ich <- NA
+  wc_icpt_ich <- NA
+
   if (!is.na(t_poi[l_model_type[[2]]])) {
     switch(l_model_type[[2]],
            "cics" = {
-             wc_batch_ich <- NA
-
              if (xform[2] != "no") {
                wc_icpt_ich <- l_icpt[["cics"]][["icpt.orig"]]
              } else {
@@ -519,9 +521,6 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
                } else {
                  wc_icpt_ich <- l_icpt[["dics"]][["icpt"]][wc_batch_ich]
                }
-             } else {
-               wc_batch_ich <- NA
-               wc_icpt_ich <- NA
              }
            },
            "dids" = {
@@ -533,14 +532,8 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
                } else {
                  wc_icpt_ich <- l_icpt[["dids"]][["icpt"]][wc_batch_ich]
                }
-             } else {
-               wc_batch_ich <- NA
-               wc_icpt_ich <- NA
              }
            })
-  } else {
-    wc_batch_ich <- NA
-    wc_icpt_ich <- NA
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -651,8 +644,9 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 #' @importFrom stats as.formula
 #' @importFrom stats coef
 #' @importFrom stats predict
+#' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 aes_string
+#' @importFrom ggplot2 aes
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 geom_hline
@@ -684,14 +678,14 @@ plot_expirest_osle <- function(
   if (!(show_grouping %in% c("yes", "no"))) {
     stop("Please specify show_grouping either as \"yes\" or \"no\".")
   }
-  if (!is.numeric(y_range) | length(y_range) != 2) {
+  if (!is.numeric(y_range) || length(y_range) != 2) {
     stop("The parameter y_range must be a vector of length 2.")
   }
   if (y_range[1] > y_range[2]) {
     stop("The parameter y_range must be of the form c(min, max).")
   }
   if (!is.null(x_range)) {
-    if (!is.numeric(x_range) | length(x_range) != 2) {
+    if (!is.numeric(x_range) || length(x_range) != 2) {
       stop("The parameter x_range must be a vector of length 2.")
     }
     if (x_range[1] > x_range[2]) {
@@ -716,6 +710,9 @@ plot_expirest_osle <- function(
   }
 
   expob <- model
+
+  # Make visible binding for global variable
+  LL <- UL <- NULL
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Extraction of models and of the model type
@@ -1048,52 +1045,59 @@ plot_expirest_osle <- function(
   }
 
   if (show_grouping == "no") {
-    ggraph <- ggplot(d_dat, aes_string(x = time_vbl, y = response_vbl)) +
+    ggraph <-
+      ggplot(d_dat,
+             aes(x = .data[[time_vbl]], y = .data[[response_vbl]])) +
       geom_point(size = 2, shape = 1) +
       geom_line(data = d_pred,
-                aes_string(x = time_vbl, y = response_vbl),
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]]),
                 colour = "royalblue", linetype = "solid")
 
     switch(ci_app,
            "line" = {
              ggraph <- ggraph +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "LL"),
+               geom_line(data = d_pred, aes(x = .data[[time_vbl]], y = LL),
                          colour = "royalblue", linetype = "solid",
-                         size = 0.5) +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "UL"),
+                         linewidth = 0.5) +
+               geom_line(data = d_pred, aes(x = .data[[time_vbl]], y = UL),
                          colour = "royalblue", linetype = "solid",
-                         size = 0.5)
+                         linewidth = 0.5)
            },
            "ribbon" = {
              ggraph <- ggraph +
-               geom_ribbon(data = d_pred,
-                           aes_string(ymin = "LL", ymax = "UL"),
+               geom_ribbon(data = d_pred, aes(ymin = LL, ymax = UL),
                            fill = "royalblue", alpha = 0.25)
            })
 
     ggraph <- ggraph + theme(legend.position = "none")
   } else {
-    ggraph <- ggplot(d_dat, aes_string(x = time_vbl, y = response_vbl)) +
-      geom_point(size = 2, aes_string(colour = batch_vbl, shape = batch_vbl)) +
+    ggraph <-
+      ggplot(d_dat,
+             aes(x = .data[[time_vbl]], y = .data[[response_vbl]])) +
+      geom_point(aes(colour = .data[[batch_vbl]],
+                     shape = .data[[batch_vbl]]), size = 2) +
       geom_line(data = d_pred,
-                aes_string(x = time_vbl, y = response_vbl, colour = batch_vbl),
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]],
+                    colour = .data[[batch_vbl]]),
                 linetype = "solid")
 
     switch(ci_app,
            "line" = {
              ggraph <- ggraph +
                geom_line(data = d_pred,
-                         aes_string(x = time_vbl, y = "LL", colour = batch_vbl),
-                         linetype = "solid", size = 0.5) +
+                         aes(x = .data[[time_vbl]], y = LL,
+                             colour = .data[[batch_vbl]]),
+                         linetype = "solid", linewidth = 0.5) +
                geom_line(data = d_pred,
-                         aes_string(x = time_vbl, y = "UL", colour = batch_vbl),
-                         linetype = "solid", size = 0.5)
+                         aes(x = .data[[time_vbl]], y = UL,
+                             colour = .data[[batch_vbl]]),
+                         linetype = "solid", linewidth = 0.5)
            },
            "ribbon" = {
              ggraph <- ggraph +
                geom_ribbon(data = d_pred,
-                           aes_string(ymin = "LL", ymax = "UL",
-                                      fill = batch_vbl), alpha = 0.25)
+                           aes(ymin = LL, ymax = UL,
+                               fill = .data[[batch_vbl]]), alpha = 0.25)
            })
 
     ggraph <- ggraph + theme(legend.position = c(0.04, 0.96),
@@ -1124,7 +1128,7 @@ plot_expirest_osle <- function(
   if (plot_option == "full") {
     ggraph <- ggraph +
       geom_text(data = d_text,
-                aes_string(x = time_vbl, y = response_vbl),
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]]),
                 label = d_text$Label, hjust = "right", size = 4,
                 lineheight = 0.8, colour = d_text$Colour)
   }

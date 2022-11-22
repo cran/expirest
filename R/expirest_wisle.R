@@ -139,14 +139,12 @@
 #' Therapeutic Goods Administration (TGA) of the Department of Health of the
 #' Australian Government, Australian Regulatory Guidelines for Prescription
 #' Medicines (ARGPM), Stability testing for prescription medicines,
-#' Version 1.1, March 2017\cr
-#' \url{https://www.tga.gov.au/stability-testing-prescription-medicines}
+#' Version 1.1, March 2017
 #'
 #' International Council for Harmonisation of Technical Requirements for
 #' Registration of Pharmaceuticals for Human (ICH), Harmonised Tripartite
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
-#' (CPMP/ICH/420/02).\cr
-#' \url{https://www.ich.org/page/quality-guidelines}
+#' (CPMP/ICH/420/02).
 #'
 #' @seealso \code{\link{expirest_osle}}, \code{\link{find_poi}},
 #' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
@@ -192,7 +190,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   if (!is.numeric(rl)) {
     stop("The parameter rl must be a numeric.")
   }
-  if (!is.numeric(rl_sf) & all(!is.na(rl_sf))) {
+  if (!is.numeric(rl_sf) && all(!is.na(rl_sf))) {
     stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
   }
   if (sum(rl_sf < 0) > 0) {
@@ -204,7 +202,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   if (!isTRUE(all.equal(rl_sf, as.integer(rl_sf)))) {
     stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
   }
-  if (!is.numeric(sl) | length(sl) > 2) {
+  if (!is.numeric(sl) || length(sl) > 2) {
     stop("The parameter sl must be a numeric or vector of length 1 or 2.")
   }
   if (length(sl) == 2) {
@@ -212,7 +210,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
       stop("The parameter sl must be of the form c(lower, upper).")
     }
   }
-  if (!is.numeric(sl_sf) & all(!is.na(sl_sf))) {
+  if (!is.numeric(sl_sf) && all(!is.na(sl_sf))) {
     stop("The parameter sl_sf must be a positive integer of length sl.")
   }
   if (sum(sl_sf < 0) > 0) {
@@ -224,19 +222,19 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   if (!isTRUE(all.equal(sl_sf, as.integer(sl_sf)))) {
     stop("The parameter sl_sf must be a positive integer of length sl.")
   }
-  if (!is.numeric(srch_range) | length(srch_range) != 2) {
+  if (!is.numeric(srch_range) || length(srch_range) != 2) {
     stop("The parameter srch_range must be a vector of length 2.")
   }
-  if (alpha <= 0 | alpha > 1) {
+  if (alpha <= 0 || alpha > 1) {
     stop("Please specify alpha as (0, 1].")
   }
-  if (alpha_pool <= 0 | alpha_pool > 1) {
+  if (alpha_pool <= 0 || alpha_pool > 1) {
     stop("Please specify alpha_pool as (0, 1].")
   }
   if (length(xform) != 2) {
     stop("Please specify xform appropriately.")
   }
-  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) |
+  if (!(xform[1] %in% c("no", "log", "sqrt", "sq")) ||
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
@@ -260,17 +258,17 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   }
 
   if (length(sl) == 1) {
-    if (ivl_side == "lower" & !all(rl > sl)) {
+    if (ivl_side == "lower" && !all(rl > sl)) {
       stop("If ivl_side is \"lower\" rl must be > sl.")
     }
-    if (ivl_side == "upper" & !all(rl < sl)) {
+    if (ivl_side == "upper" && !all(rl < sl)) {
       stop("If ivl_side is \"upper\" rl must be < sl.")
     }
   } else {
-    if (ivl_side == "lower" & !all(rl > sl[1])) {
+    if (ivl_side == "lower" && !all(rl > sl[1])) {
       stop("If ivl_side is \"lower\" rl must be > sl.")
     }
-    if (ivl_side == "upper" & !all(rl < sl[2])) {
+    if (ivl_side == "upper" && !all(rl < sl[2])) {
       stop("If ivl_side is \"upper\" rl must be < sl.")
     }
   }
@@ -402,9 +400,9 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   # Example: the response is the assay, and the lower specification limit is
   # the relevant limit. A batch may have a shorter POI than the other batches,
   # but because it has a higher intercept or/and smaller variability than one
-  # or more of the other batches, it may be that the lower confidence or
-  # prediction interval limit of one of the other batches is closer to the
-  # lower specification limit so that their POI values are the POI values of
+  # or more of the other batches, the lower confidence or prediction interval
+  # limit of one of the other batches still may be closer to the lower
+  # specification limit so that their POI values are the POI values of
   # relevance.
 
   # Note: in case of the "dids" model the POI is not determined using the model
@@ -490,14 +488,6 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
     l_prl[[variety]] <- a_prl
   }
 
-  if (sum(vapply(l_poi, is.null, logical(1))) > 0) {
-    stop("Not all POI values for all wcs limits calculated.")
-  }
-
-  if (sum(vapply(l_prl, is.null, logical(1))) > 0) {
-    stop("Not all prediction limits for all POI values calculated.")
-  }
-
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of the batches with the confidence or prediction interval
   # limits that are closest to the respective specification limit for each
@@ -519,20 +509,12 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
            })
          })
 
-  if (sum(!(names(l_prl) %in% names(l_min_dist))) > 0) {
-    stop("Not all minimal distances (interval - specification) determined.")
-  }
-
   # Determination of the smallest POI value for each model and each rl value
   l_min_poi <- lapply(l_poi, FUN = function(x) {
     apply(x, 1, function(y) {
       ifelse(length(which.min(y)) != 0, which.min(y), NA)
     })
   })
-
-  if (sum(!(names(l_poi) %in% names(l_min_poi))) > 0) {
-    stop("Not all minimal POI values determined.")
-  }
 
   # Determination of the worst case batches for each model and each rl value:
   #   The worst case batches are the ones with the confidence or prediction
@@ -556,10 +538,6 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
         },
         numeric(1))
     }
-  }
-
-  if (sum(vapply(l_wc_batch, is.null, logical(1))) > 0) {
-    stop("Not all worst case batches for all minimal POI values determined.")
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -719,8 +697,9 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #' @importFrom stats as.formula
 #' @importFrom stats coef
 #' @importFrom stats predict
+#' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 aes_string
+#' @importFrom ggplot2 aes
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 geom_hline
@@ -749,27 +728,27 @@ plot_expirest_wisle <- function(
   if (!inherits(model, "expirest_wisle")) {
     stop("The model must be an object of class expirest_wisle.")
   }
-  if (!is.numeric(rl_index) | length(rl_index) > 1) {
+  if (!is.numeric(rl_index) || length(rl_index) > 1) {
     stop("The parameter rl_index must be a positive integer of length 1.")
   }
   if (rl_index != as.integer(rl_index)) {
     stop("The parameter rl_index must be a positive integer of length 1.")
   }
-  if (rl_index < 1 | rl_index > nrow(model[["POI"]])) {
+  if (rl_index < 1 || rl_index > nrow(model[["POI"]])) {
     stop("The parameter rl_index must be between 1 and the number of rl ",
          "values.")
   }
   if (!(show_grouping %in% c("yes", "no"))) {
     stop("Please specify show_grouping either as \"yes\" or \"no\".")
   }
-  if (!is.numeric(y_range) | length(y_range) != 2) {
+  if (!is.numeric(y_range) || length(y_range) != 2) {
     stop("The parameter y_range must be a vector of length 2.")
   }
   if (y_range[1] > y_range[2]) {
     stop("The parameter y_range must be of the form c(min, max).")
   }
   if (!is.null(x_range)) {
-    if (!is.numeric(x_range) | length(x_range) != 2) {
+    if (!is.numeric(x_range) || length(x_range) != 2) {
       stop("The parameter x_range must be a vector of length 2.")
     }
     if (x_range[1] > x_range[2]) {
@@ -798,6 +777,9 @@ plot_expirest_wisle <- function(
   }
 
   expob <- model
+
+  # Make visible binding for global variable
+  LL <- UL <- NULL
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Extraction of models and of the model type
@@ -983,10 +965,11 @@ plot_expirest_wisle <- function(
     m_pred <- predict(model, newdata = d_new, interval = ivl,
                       level = 1 - alpha)
   } else {
-    l_pred <- lapply(t_batches, function(x)
+    l_pred <- lapply(t_batches, function(x) {
       predict(l_models$individual[[x]],
               newdata = d_new[d_new[, batch_vbl] == x, ],
-              interval = ivl, level = 1 - alpha))
+              interval = ivl, level = 1 - alpha)
+    })
     m_pred <- do.call(rbind, l_pred)
   }
 
@@ -1491,51 +1474,56 @@ plot_expirest_wisle <- function(
   }
 
   if (show_grouping == "no") {
-    ggraph <- ggplot(d_dat, aes_string(x = time_vbl, y = response_vbl)) +
+    ggraph <- ggplot(d_dat,
+                     aes(x = .data[[time_vbl]], y = .data[[response_vbl]])) +
       geom_point(size = 2, shape = 1) +
       geom_line(data = d_pred,
-                aes_string(x = time_vbl, y = response_vbl),
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]]),
                 colour = "royalblue", linetype = "solid")
 
     switch(ci_app,
            "line" = {
              ggraph <- ggraph +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "LL"),
+               geom_line(data = d_pred, aes(x = .data[[time_vbl]], y = LL),
                          colour = "royalblue", linetype = "solid",
-                         size = 0.5) +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "UL"),
+                         linewidth = 0.5) +
+               geom_line(data = d_pred, aes(x = .data[[time_vbl]], y = UL),
                          colour = "royalblue", linetype = "solid",
-                         size = 0.5)
+                         linewidth = 0.5)
            },
            "ribbon" = {
              ggraph <- ggraph +
-               geom_ribbon(data = d_pred, aes_string(ymin = "LL", ymax = "UL"),
+               geom_ribbon(data = d_pred, aes(ymin = LL, ymax = UL),
                            fill = "royalblue", alpha = 0.25)
            })
 
     ggraph <- ggraph + theme(legend.position = "none")
   } else {
-    ggraph <- ggplot(d_dat, aes_string(x = time_vbl, y = response_vbl)) +
-      geom_point(size = 2, aes_string(colour = batch_vbl, shape = batch_vbl)) +
+    ggraph <- ggplot(d_dat, aes(x = .data[[time_vbl]],
+                                y = .data[[response_vbl]])) +
+      geom_point(size = 2, aes(colour = .data[[batch_vbl]],
+                               shape = .data[[batch_vbl]])) +
       geom_line(data = d_pred,
-                aes_string(x = time_vbl, y = response_vbl, colour = batch_vbl),
-                linetype = "solid")
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]],
+                    colour = .data[[batch_vbl]]), linetype = "solid")
 
     switch(ci_app,
            "line" = {
              ggraph <- ggraph +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "LL",
-                                                   colour = batch_vbl),
-                         linetype = "solid", size = 0.5) +
-               geom_line(data = d_pred, aes_string(x = time_vbl, y = "UL",
-                                                   colour = batch_vbl),
-                         linetype = "solid", size = 0.5)
+               geom_line(data = d_pred,
+                         aes(x = .data[[time_vbl]], y = LL,
+                             colour = .data[[batch_vbl]]),
+                         linetype = "solid", linewidth = 0.5) +
+               geom_line(data = d_pred,
+                         aes(x = .data[[time_vbl]], y = UL,
+                             colour = .data[[batch_vbl]]),
+                         linetype = "solid", linewidth = 0.5)
            },
            "ribbon" = {
              ggraph <- ggraph +
-               geom_ribbon(data = d_pred, aes_string(ymin = "LL", ymax = "UL",
-                                                     fill = batch_vbl),
-                           alpha = 0.25)
+               geom_ribbon(data = d_pred,
+                           aes(ymin = LL, ymax = UL,
+                               fill = .data[[batch_vbl]]), alpha = 0.25)
            })
 
     ggraph <- ggraph + theme(legend.position = c(0.04, 0.96),
@@ -1564,7 +1552,7 @@ plot_expirest_wisle <- function(
   if (plot_option %in% c("basic1", "lean1", "lean2", "full")) {
     ggraph <- ggraph +
       geom_text(data = d_text[show_text, ],
-                aes_string(x = time_vbl, y = response_vbl),
+                aes(x = .data[[time_vbl]], y = .data[[response_vbl]]),
                 label = d_text[show_text, "Label"], hjust = "right",
                 size = 4, lineheight = 0.8,
                 colour = d_text[show_text, "Colour"])
@@ -1575,24 +1563,24 @@ plot_expirest_wisle <- function(
       geom_vline(xintercept = d_vlines[, time_vbl],
                  colour = d_vlines$Colour, linetype = d_vlines$Type) +
       geom_segment(data = d_seg[show_seg, ],
-                   aes_string(x = paste(time_vbl, 1, sep = "."),
-                              y = paste(response_vbl, 1, sep = "."),
-                              xend = paste(time_vbl, 2, sep = "."),
-                              yend = paste(response_vbl, 2, sep = ".")),
+                   aes(x = .data[[paste(time_vbl, 1, sep = ".")]],
+                       y = .data[[paste(response_vbl, 1, sep = ".")]],
+                       xend = .data[[paste(time_vbl, 2, sep = ".")]],
+                       yend = .data[[paste(response_vbl, 2, sep = ".")]]),
                    colour = d_seg$Colour[show_seg],
                    linetype = d_seg$Type[show_seg],
-                   size = d_seg$Size[show_seg])
+                   linewidth = d_seg$Size[show_seg])
   }
 
   if (plot_option == "full") {
     ggraph <- ggraph +
       geom_curve(data = d_arr,
-                 aes_string(x = paste(time_vbl, 1, sep = "."),
-                            y = paste(response_vbl, 1, sep = "."),
-                            xend = paste(time_vbl, 2, sep = "."),
-                            yend = paste(response_vbl, 2, sep = ".")),
+                 aes(x = .data[[paste(time_vbl, 1, sep = ".")]],
+                     y = .data[[paste(response_vbl, 1, sep = ".")]],
+                     xend = .data[[paste(time_vbl, 2, sep = ".")]],
+                     yend = .data[[paste(response_vbl, 2, sep = ".")]]),
                  colour = d_arr$Colour, linetype = d_arr$Line.Type,
-                 size = d_arr$Size, curvature = d_arr$Curvature,
+                 linewidth = d_arr$Size, curvature = d_arr$Curvature,
                  angle = d_arr$Angle, ncp = 20, lineend = "round",
                  arrow = arrow(length = unit(d_arr$Length, "points"),
                                type = d_arr$Arrow.Type))
