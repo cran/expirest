@@ -26,15 +26,15 @@ test_that("extract_from_ll_wcsl_succeeds", {
 
   # <-><-><-><->
 
-  l_dlim <- extract_from_ll_wcsl(ll_wcsl, "delta.lim")
-  l_dlimo <- extract_from_ll_wcsl(ll_wcsl, "delta.lim.orig")
-  l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
-  l_wcslo <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim.orig")
+  l_dlim <- extract_from_ll_wcsl(ll = ll_wcsl, element = "delta.lim")
+  l_dlimo <- extract_from_ll_wcsl(ll = ll_wcsl, element = "delta.lim.orig")
+  l_wcsl <- extract_from_ll_wcsl(ll = ll_wcsl, element = "wcs.lim")
+  l_wcslo <- extract_from_ll_wcsl(ll = ll_wcsl, element = "wcs.lim.orig")
 
   # <-><-><-><->
 
-  expect_equivalent(names(l_dlim), c("cics", "dics", "dids"))
-  expect_equivalent(vapply(l_dlim, is.matrix, logical(1)), rep(TRUE, 3))
+  expect_equivalent(names(l_dlim), c("cics", "dics", "dids.pmse", "dids"))
+  expect_equivalent(vapply(l_dlim, is.matrix, logical(1)), rep(TRUE, 4))
   expect_equivalent(colnames(l_dlimo[["dics"]]), c("b2", "b5", "b7"))
   expect_equivalent(l_wcsl, l_wcslo)
 })
@@ -66,10 +66,16 @@ test_that("extract_from_ll_wcsl_fails", {
 
   ll3 <- list(cics = ll2[[1]][[1]],
               dics = ll2[[2]][[1]],
-              dids = ll2[[3]][[1]])
+              dids.pmse = ll2[[3]][[1]],
+              dids = ll2[[4]][[1]])
 
   ll4 <- ll2
-  names(ll4[[1]][[1]][[1]]) <-
+  names(ll4[["cics"]][[1]][[1]]) <-
+    c("xform", "shift", "delta.limit", "delta.limit.original",
+      "wcs.limit", "wcs.limit.original")
+
+  ll5 <- ll2
+  names(ll5[["dics"]][["b2"]][[1]]) <-
     c("xform", "shift", "delta.limit", "delta.limit.original",
       "wcs.limit", "wcs.limit.original")
 
@@ -77,7 +83,7 @@ test_that("extract_from_ll_wcsl_fails", {
 
   expect_error(
     extract_from_ll_wcsl(ll = ll1, element = "wcs.lim"),
-    "ll must have three elements named")
+    "ll must have four elements named")
   expect_error(
     extract_from_ll_wcsl(ll = ll2, element = "worst.case.limit"),
     "specify element either as")
@@ -86,5 +92,8 @@ test_that("extract_from_ll_wcsl_fails", {
     "parameter ll must be a list of lists")
   expect_error(
     extract_from_ll_wcsl(ll = ll4, element = "wcs.lim"),
-    "element was not found in the element names")
+    "element was not found in one of the sub-elements")
+  expect_error(
+    extract_from_ll_wcsl(ll = ll5, element = "wcs.lim"),
+    "element was not found in one of the sub-elements")
 })

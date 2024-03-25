@@ -7,36 +7,37 @@
 #'
 #' @param data A data frame with the columns specified by \code{response_vbl},
 #'   \code{time_vbl} and \code{batch_vbl}.
-#' @param response_vbl A character string specifying the response variable name
+#' @param response_vbl A character string that specifies the response variable
+#'   name that must be a column of \code{data}.
+#' @param time_vbl A character string that specifies the time variable name
 #'   that must be a column of \code{data}.
-#' @param time_vbl A character string specifying the time variable name that
-#'   must be a column of \code{data}.
-#' @param batch_vbl A character string specifying the column in \code{data}
+#' @param batch_vbl A character string that specifies the column in \code{data}
 #'   with the grouping information (i.e. a factorial variable) for the
-#'   differentiation of the observations of the different batches.
-#' @param sl A numeric value or a numeric vector of length \code{2} specifying
-#'   the specification limit or limits. If a vector is provided it must be of
-#'   the form \code{c(lower limit, upper limit)}.
-#' @param sl_sf A positive integer or a vector of positive integers specifying
-#'   the number of \dQuote{significant figures} (sf) of \code{sl}. It must have
-#'   the same length as \code{sl}.
-#' @param srch_range A vector of length \code{2} specifying the end-points of
-#'   the (time) range that is supposed to contain the shelf life or retest
+#'   differentiation of the observations of the various batches.
+#' @param sl A numeric value or a numeric vector of length \code{2} that
+#'   specifies the specification limit or limits. If a vector is provided it
+#'   must be of the form \code{c(lower limit, upper limit)}.
+#' @param sl_sf A positive integer or a vector of positive integers that
+#'   specifies the number of \dQuote{significant figures} (sf) of \code{sl}.
+#'   It must have the same length as \code{sl}.
+#' @param srch_range A vector of length \code{2} that specifies the end-points
+#'   of the (time) range that is supposed to contain the shelf life or retest
 #'   period.
-#' @param alpha A numeric value between 0 and 1 specifying the significance
+#' @param alpha A numeric value between 0 and 1 that specifies the significance
 #'   level for the calculation of confidence or prediction intervals. The
 #'   default is \code{0.05}.
-#' @param alpha_pool A numeric value between 0 and 1 specifying the type I
+#' @param alpha_pool A numeric value between 0 and 1 that specifies the type I
 #'   error rate for the test of the poolability of the batches. The default
 #'   is \code{0.25}, following ICH Q1E guideline. The value should not be
 #'   changed unless supported by well-founded reasons.
-#' @param xform A vector of two character strings specifying the transformation
-#'   of the response and the time variable. The default is \dQuote{no}
-#'   transformation, i.e. \code{c("no", "no")}, where the first element
-#'   specifies the transformation of the \eqn{x} variable and the second
-#'   element the transformation of the \eqn{y} variable. Valid alternatives
-#'   for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-#'   (natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).
+#' @param xform A vector of two character strings that specifies the
+#'   transformation of the response and the time variable. The default is
+#'   \dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+#'   element specifies the transformation of the \eqn{x} variable and the
+#'   second element the transformation of the \eqn{y} variable. Valid
+#'   alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+#'   \code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+#'   \code{"sq"} (square).
 #' @param shift A vector of two values which will be added to the variables
 #'   \eqn{x} and/or \eqn{y} before they are transformed as specified by the
 #'   \code{xform} parameter, where the first element will be added to the
@@ -44,33 +45,35 @@
 #'   purpose is to prevent an undefined state which could arise when variables
 #'   with values of \eqn{\leq 0} are log or square root transformed. The
 #'   default is \code{c(0, 0)}.
-#' @param sf_option A character string specifying if the limits (\code{rl}
+#' @param sf_option A character string that specifies if the limits (\code{rl}
 #'   or \code{sl}) should be regarded as \dQuote{tight} or \dQuote{loose}, i.e.
-#'   either \code{"tight"} or \code{"loose"}, respectively. The option
-#'   \code{"tight"} means that the limits are rounded to the specified number
-#'   of significant figures specified by the parameters \code{rl_sf} and
-#'   \code{sl_sf}. In case of the option \code{"loose"} the limits are rounded
-#'   to the specified number of significant figures (\eqn{n}), followed by the
-#'   subtraction of \eqn{1} from the \eqn{n^{th}} digit and addition of
-#'   \eqn{5} to the \eqn{(n + 1)^{th}} digit if \code{ivl_side} is
-#'   \code{"lower"}, or followed by the addition of \eqn{4} to the
-#'   \eqn{(n + 1)^{th}} digit if \code{ivl_side} is \code{"upper"}.
+#'   either \code{"tight"} or \code{"loose"}, respectively. The default is
+#'   \code{"tight"}. The option \code{"tight"} means that the limits are
+#'   rounded to the number of significant digits specified by the parameters
+#'   \code{rl_sf} and \code{sl_sf}. If \code{sf_option = "loose"}, four on
+#'   the order of the last significant digit + 1 is added if
+#'   \code{ivl_side = "upper"} or five on the order of the last significant
+#'   digit + 1 is subtracted if \code{ivl_side = "upper"}.
 #' @param ivl A character string of either \code{"confidence"} or
-#'   \code{"prediction"}, i.e. specifying the type of interval of interest.
+#'   \code{"prediction"} that specifies the type of interval of interest.
 #'   The default is \code{"confidence"}.
-#' @param ivl_type A character string specifying if a \dQuote{one sided} or
-#'   a \dQuote{two sided} interval should be calculated, i.e. either
+#' @param ivl_type A character string that specifies if a \dQuote{one sided}
+#'   or a \dQuote{two sided} interval should be calculated, i.e. either
 #'   \code{"one.sided"} or \code{"two.sided"}, respectively. The default is
 #'   \code{"one.sided"}.
-#' @param ivl_side A character string specifying if the \dQuote{upper} or the
-#'   \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
-#'   \code{"lower"}, respectively. The default is \code{"lower"}.
+#' @param ivl_side A character string that specifies if the specification
+#'   limit, given that the limit has only one side, is an \dQuote{upper} or a
+#'   \dQuote{lower} bound, i.e. it is specified as either \code{"upper"} or
+#'   \code{"lower"}, respectively. The default is \code{"lower"}. If the
+#'   specification has two boundaries, then this parameter specifies the
+#'   preferred side. If no side is preferred over the other, \code{"both"} can
+#'   be used.
 #' @param ... Additional named or unnamed arguments passed on to
 #'   \code{uniroot()}.
 #'
 #' @details According to ICH Q1E guideline, \dQuote{\emph{an appropriate
 #' approach to retest period or shelf life estimation is to analyse a
-#' quantitative  attribute by determining the earliest time at which the 95
+#' quantitative attribute by determining the earliest time at which the 95
 #' percent confidence limit for the mean intersects the proposed acceptance
 #' criterion}} (in this package, this point is called the \dQuote{point of
 #' intersection} (POI)). Furthermore, it says that \dQuote{\emph{for an
@@ -78,22 +81,26 @@
 #' confidence limit should be compared to the acceptance criterion. For an
 #' attribute that can either increase or decrease, or whose direction of change
 #' is not known, two-sided 95 percent confidence limits should be calculated
-#' and compared to the upper and lower acceptance criteria.}} With respect to
-#' the number of batches to be included in the analysis it says that
-#' \dQuote{\emph{the retest period or shelf life is generally estimated based
-#' on the stability data from a minimum of three batches.}}
+#' and compared to the upper and lower acceptance criteria.}} The approach
+#' can be used to estimate the retest period or shelf life for a single batch
+#' or for multiple batches. According to the guideline, \dQuote{\emph{for a
+#' drug substance or for a drug product available in a single strength and a
+#' single container size and/or fill, the retest period or shelf life is
+#' generally estimated based on the stability data from a minimum of three
+#' batches.}}
 #'
-#' Before performing the retest period or shelf life estimation the most
-#' suitable model should be determined. It should particularly be verified
-#' if data of all test batches are poolable or not. Details on this are
-#' described in section \dQuote{Checking batch poolability} below.
+#' Before performing the retest period or shelf life estimation with results
+#' from multiple batches, the most suitable model should be determined. It
+#' should particularly be verified if data of all test batches are poolable or
+#' not. Details on this are described in section \dQuote{Checking batch
+#' poolability} below.
 #'
 #' @section Checking batch poolability:
 #' According to ICH Q1E guideline, construction of the 95\% confidence interval
 #' on the basis of the combined data of all test batches is allowed only if it
 #' has been confirmed by aid of a statistical test whether the regression lines
 #' from the different batches have a common slope and a common intercept. A
-#' significance level of \code{alpha_pool = 0.25} has to be used for both
+#' significance level of \code{alpha_pool = 0.25} should to be used for both
 #' batch-related terms, and the test of the slopes has to precede the test of
 #' the intercepts. From these tests, three possible models may be appropriate,
 #' i.e.
@@ -103,14 +110,20 @@
 #'  \item a \emph{different intercept / different slope} model (dids).
 #' }
 #' The \emph{common intercept / different slope} model is not of practical
-#' relevance because the corresponding model is missing an effect. If the slopes
-#' are significantly different, there is no point comparing intercepts.
+#' relevance because the corresponding model is missing an effect. If the
+#' slopes are significantly different, there is no point comparing intercepts.
+#' The dids model has individual intercepts and individual slopes, and the
+#' calculation of confidence intervals is based on the corresponding individual
+#' mean square errors. The \emph{different intercept / different slope} model
+#' where the mean square error is pooled across batches is reported as
+#' dids.pmse.
 #'
 #' These requirements can be checked by aid of an \dQuote{ANalysis of
-#' COVAriance} (ANCOVA) including the batch variable as interaction term. The
-#' full ANCOVA model simultaneously tests all the effects, and non-significant
-#' effects can be identified and removed for fitting of the final regression
-#' model that is used for the estimation of the shelf life or retest period.
+#' COVAriance} (ANCOVA) including the batch variable as main effect and as
+#' \eqn{batch \times time} interaction term. The full ANCOVA model
+#' simultaneously tests all the effects, and non-significant effects can be
+#' identified and removed for fitting of the final regression model that is
+#' used for the estimation of the shelf life or retest period.
 #'
 #' The significance level (\code{alpha_pool = 0.25}, Type I error) is used to
 #' increase the power of the test to detect cases where the data should not be
@@ -129,34 +142,42 @@
 #' \item{Variables}{A list of the variable names, i.e. the original names of
 #'   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
 #'   applicable, of the transformed variables.}
-#' \item{Model.Type}{A list of five elements specifying which model, based on
-#'   the ANCOVA analysis, suits best. The first element (\code{type.spec})
-#'   is a numeric vector of length 2 specifying the best model accepted at the
-#'   significance level of 0.25. The first number represents the decision on
-#'   the intercept and the second on the slope, where \code{1} stands for
-#'   \dQuote{common} and \code{2} stands for \dQuote{different}. The second
-#'   element (\code{type.acronym}) is an acronym representing the first item.}
+#' \item{Model.Type}{A list of two elements that specifies which model, based
+#'   on the ANCOVA analysis, suits best. The first element (\code{type.spec})
+#'   is a numeric vector of length 2 that specifies the best model accepted at
+#'   the significance level specified by \code{alpha.pool}. The first number
+#'   represents the decision on the intercept and the second on the slope,
+#'   where \code{1} stands for \dQuote{common} and \code{2} stands for
+#'   \dQuote{different}. The second element (\code{type.acronym}) is an acronym
+#'   representing the first item.}
 #' \item{Models}{A list of four elements named \code{cics}, \code{dics},
-#'   \code{dids} and \code{individual}. The first three elements contain the
+#'   \code{dids.pmse} and \code{dids}. The first three elements contain the
 #'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
 #'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
 #'   and \dQuote{different intercept / different slope} (\code{dids}) models.
-#'   The fourth element is a list of the \sQuote{\code{lm}} objects of the
-#'   models obtained from fitting the data of each batch individually.}
+#'   The fourth element is a list of the \sQuote{\code{lm}} objects that is
+#'   obtained from fitting a regression model to the data of each level of the
+#'   categorical variable separately. The \code{cics}, \code{dics} and
+#'   \code{dids.pmse} elements are \code{NA} if data of only a single batch
+#'   is available.}
 #' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
-#'   values of each of the three fitted models.}
+#'   values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 #' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
-#'   values of each of the three fitted models.}
-#' \item{wc.icpt}{A numeric value of the worst case intercept.}
-#' \item{wc.batch}{A numeric value of the worst case batch. In case of the
-#'  \code{dids} model type, the estimation is done using the models obtained
-#'  from fitting the data of each batch individually.}
+#'   values of each of the \code{cics}, \code{dics} and \code{dids.pmse}
+#'   models.}
+#' \item{wc.icpt}{A numeric named vector of the worst case intercepts. The
+#'   information about which limit the corresponding confidence interval
+#'   crosses is stored in the attribute named \code{side}.}
+#' \item{wc.batch}{A numeric named vector of the batches with the worst case
+#'   intercepts. The information about which limit the corresponding confidence
+#'   interval crosses is stored in the attribute named \code{side}.}
 #' \item{Limits}{A list of all limits.}
-#' \item{Intercepts}{A list of the intercepts of the three fitted models.}
-#' \item{POI}{A numeric named vector of the POI values of each of the three
-#'   fitted models. In case of the \code{dids} model type, the estimation is
-#'   done using the models obtained from fitting the data of each
-#'   batch individually.}
+#' \item{Intercepts}{A list of the intercepts of all models.}
+#' \item{All.POI}{A list of two elements named \code{lower} and \code{upper}
+#'   that contain either NA or lists of the POI values of all models.}
+#' \item{POI}{A numeric named vector of the POI values of the worst case
+#'   batches of each model. The information about which limit the corresponding
+#'   confidence interval crosses is stored in the attribute named \code{side}.}
 #'
 #' @references
 #' International Council for Harmonisation of Technical Requirements for
@@ -164,25 +185,20 @@
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 #' (CPMP/ICH/420/02).
 #'
-#' @seealso \code{\link{expirest_wisle}}, \code{\link{find_poi}},
-#' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
-#' \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
+#' @seealso \code{\link{expirest_wisle}}, \code{\link[stats]{uniroot}},
+#' \code{\link[stats]{lm}}, \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
 #'
 #' @example man/examples/examples_expirest_osle.R
 #'
-#' @importFrom stats lm
-#' @importFrom stats as.formula
-#' @importFrom stats coef
-#' @importFrom stats AIC
-#' @importFrom stats BIC
+#' @importFrom stats setNames
 #'
 #' @export
 
-expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
-                       sl, sl_sf, srch_range, alpha = 0.05, alpha_pool = 0.25,
-                       xform = c("no", "no"), shift = c(0, 0),
-                       sf_option = "loose", ivl = "confidence",
-                       ivl_type = "one.sided", ivl_side = "lower", ...) {
+expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl, sl, sl_sf,
+                          srch_range, alpha = 0.05, alpha_pool = 0.25,
+                          xform = c("no", "no"), shift = c(0, 0),
+                          sf_option = "tight", ivl = "confidence",
+                          ivl_type = "one.sided", ivl_side = "lower", ...) {
   if (!is.data.frame(data)) {
     stop("The data must be provided as data frame.")
   }
@@ -243,10 +259,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (length(shift) != 2) {
-    stop("The parameter shift must be a numeric vector of length 2.")
-  }
-  if (!is.numeric(shift)) {
+  if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
   if (!(sf_option %in% c("tight", "loose"))) {
@@ -258,8 +271,18 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   if (!(ivl_type %in% c("one.sided", "two.sided"))) {
     stop("Please specify ivl_type either as \"one.sided\" or \"two.sided\".")
   }
-  if (!(ivl_side %in% c("lower", "upper"))) {
-    stop("Please specify ivl_side either as \"lower\" or \"upper\".")
+  if (!(ivl_side %in% c("lower", "upper", "both"))) {
+    stop("Please specify ivl_side either as \"lower\", \"upper\" or \"both\".")
+  }
+  if (ivl_side == "both" && length(sl) == 1) {
+    stop("Since ivl_side = \"both\", a specification with two sides is ",
+         "expected. Only one side has been specified, though, i.e. ",
+         "sl = ", sl, ".\nPlease provide a specification with two sides.")
+  }
+  # Check that if ivl_side is "both" then ivl_type must be "two.sided"
+  if (ivl_side == "both" && ivl_type != "two.sided") {
+    warning("Since ivl_side is specified as \"both\" the parameter ivl_type ",
+            "has been set to \"two.sided\".")
   }
 
   if (length(sl) == 2) {
@@ -296,6 +319,26 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   mrl <- match(c("rl"), names(mf), 0L)
   mrlsf <- match(c("rl_sf"), names(mf), 0L)
 
+  if (mrl != 0 && ivl_side == "both") {
+    stop("For the assessment of release limits (rl), ivl_side must be ",
+         "either \"lower\" or \"upper\".\n",
+         "expirest_osle() was called with ivl_side = \"both\".")
+  }
+
+  # Although release limits are not relevant for the osle approach. However,
+  # since expirest_wisle() calls expirest_osle(), this function must be able
+  # to hand down the information and return the results appropriately.
+  if (mrl == 0) {
+    rl <- NA
+  } else {
+    rl <- mf[[mrl]]
+  }
+  if (mrlsf == 0) {
+    rl_sf <- NA
+  } else {
+    rl_sf <- mf[[mrlsf]]
+  }
+
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Linearisation of data by variable transformation
   # Transformations:
@@ -307,237 +350,54 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   #       the shift parameter before performing the transformation.
 
   d_dat <-
-    get_xformed_variables(data = droplevels(data), response_vbl = response_vbl,
+    get_xformed_variables(data = data, response_vbl = response_vbl,
                           time_vbl = time_vbl, xform = xform, shift = shift)
 
   l_variables <-
     get_variable_list(response_vbl = response_vbl, time_vbl = time_vbl,
                       batch_vbl = batch_vbl, xform = xform)
 
-  if (sum(xform %in% "no") == 0) {
-    response_vbl <- l_variables[["response"]]
-    time_vbl <- l_variables[["time"]]
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      time_vbl <- l_variables[["time"]]
-    }
-    if (xform[2] != "no") {
-      response_vbl <- l_variables[["response"]]
-    }
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # ANCOVA to figure out which kind of model suits the data best
-
-  tmp <- check_ancova(data = d_dat, response_vbl = response_vbl,
-                      time_vbl = time_vbl, batch_vbl = batch_vbl,
-                      alpha = alpha_pool)
-
-  common_icpt <- tmp[1]
-  common_slp <- tmp[2]
-
-  l_model_type <- list(type.spec = c(common_icpt, common_slp),
-                       type.acronym =
-                         paste0(c("di", "ci")[common_icpt + 1],
-                                c("ds", "cs")[common_slp + 1]))
+  response_vbl <- l_variables[["response"]]
+  time_vbl <- l_variables[["time"]]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Fitting of all possible models that are relevant
 
-  l_models <- vector(mode = "list", length = 4)
-  names(l_models) <- c("cics", "dics", "dids", "individual")
-
-  # ---------
-  # Common Intercept / Common Slope
-  t_formula <- paste(response_vbl, "~", time_vbl)
-  l_models[["cics"]] <-
-    do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
-
-  # ---------
-  # Different Intercept / Common Slope
-  t_formula <- paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " + "))
-  l_models[["dics"]] <-
-    do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
-
-  # ---------
-  # Different Intercept / Different Slope
-  t_formula <- paste(response_vbl, "~", paste(batch_vbl, time_vbl, sep = " * "))
-  l_models[["dids"]] <-
-    do.call("lm", list(as.formula(t_formula), data = as.name("d_dat")))
-
-  # ---------
-  # Individual
-  t_formula <- paste(response_vbl, "~", time_vbl)
-  l_models[["individual"]] <-
-    by(data = d_dat, INDICES = d_dat[, batch_vbl], FUN = function(dat) {
-      do.call("lm", list(as.formula(t_formula), data = as.name("dat")))
-    })
-
-  # ---------
-  # Determination of the Akaike Information Criterion (AIC) and Bayesian
-  # Information Criterion (BIC) of each of the relevant models
-
-  t_AIC <- vapply(l_models[1:(length(l_models) - 1)], AIC, numeric(1))
-  t_BIC <- vapply(l_models[1:(length(l_models) - 1)], BIC, numeric(1))
+  l_models <- get_model_list(data = d_dat, response_vbl = response_vbl,
+                             time_vbl = time_vbl, batch_vbl = batch_vbl)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of limits
+  # Determination and selection of limits
 
-  if (mrl > 0 && mrlsf > 0) {
-    l_lim <-
-      set_limits(rl = mf[[mrl]], rl_sf = mf[[mrlsf]], sl = sl, sl_sf = sl_sf,
-                 sf_option = sf_option, xform = xform, shift = shift,
-                 ivl_side = ivl_side)
-  } else {
-    l_lim <-
-      set_limits(rl = NA, rl_sf = NA, sl = sl, sl_sf = sl_sf,
-                 sf_option = sf_option, xform = xform, shift = shift,
-                 ivl_side = ivl_side)
-  }
+  l_lim <- set_limits(rl = rl, rl_sf = rl_sf, sl = sl, sl_sf = sl_sf,
+                      sf_option = sf_option, xform = xform, shift = shift,
+                      ivl_side = ivl_side)
 
-  # For the following assessments only the relevant specification limit is used.
-  if (length(sl) == 2) {
-    switch(ivl_side,
-           "lower" = {
-             sl_orig <- l_lim[["sl.orig"]][1]
-
-             if (xform[2] == "no") {
-               sl <- l_lim[["sl"]][1]
-             } else {
-               sl <- l_lim[["sl.trfmd"]][1]
-             }
-           },
-           "upper" = {
-             sl_orig <- l_lim[["sl.orig"]][2]
-
-             if (xform[2] == "no") {
-               sl <- l_lim[["sl"]][2]
-             } else {
-               sl <- l_lim[["sl.trfmd"]][2]
-             }
-           })
-  } else {
-    sl_orig <- l_lim[["sl.orig"]]
-
-    if (xform[2] == "no") {
-      sl <- l_lim[["sl"]]
-    } else {
-      sl <- l_lim[["sl.trfmd"]]
-    }
-  }
+  sl <- get_relevant_limits(limits_list = l_lim,
+                            xform = xform, ivl_side = ivl_side)$sl
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of intercepts of all models
 
-  l_icpt <- vapply(l_models[1:(length(l_models) - 1)], function(x) {
-    list(get_icpt(model = x, response_vbl = response_vbl,
-                  time_vbl = time_vbl, batch_vbl = batch_vbl,
-                  xform = xform, shift = shift))
-    },
-    list(1))
+  l_icpt <- get_icpt_list(data = d_dat, response_vbl = response_vbl,
+                          time_vbl = time_vbl, batch_vbl = batch_vbl,
+                          model_list = l_models[["Models"]], xform = xform,
+                          shift = shift)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Calculation of POI values for all three model types
+  # Determination of POI values of all models
 
-  # Note: in case of the dids model type, the POI is not determined using the
-  # model that was determined using the data from all batches (i.e. the full
-  # model with the batch_vbl * time_vbl interaction term). Instead, separate
-  # models are fitted to the data of each individual batch and the POI values
-  # are determined for each of these models.
-
-  t_poi <- rep(NA, 3)
-  names(t_poi) <- names(l_icpt)
-
-  for (variety in names(t_poi)) {
-    if (variety != "dids") {
-      tmp <- try_get_model(
-        find_poi(srch_range = srch_range, model = l_models[[variety]], sl = sl,
-                 alpha = alpha, ivl_type = ivl_type, ivl_side = ivl_side,
-                 ivl = ivl)
-      )
-
-      if (is.null(tmp[["Error"]])) {
-        t_poi[variety] <- tmp[["Model"]]
-      }
-    } else {
-      t_poi_dids <-
-        vapply(l_models[["individual"]],
-               function(x) {
-                 tmp <- try_get_model(
-                   find_poi(srch_range = srch_range,
-                            model = x,
-                            sl = sl, alpha = alpha, ivl_type = ivl_type,
-                            ivl_side = ivl_side, ivl = ivl)
-                 )
-
-                 ifelse(is.null(tmp[["Error"]]), tmp[["Model"]], NA)
-               },
-               numeric(1))
-
-      if (sum(is.na(t_poi_dids)) == 0) {
-        t_poi[variety] <- as.numeric((t_poi_dids[which.min(t_poi_dids)]))
-      }
-    }
-  }
-
-  if (sum(is.na(t_poi)) != 0) {
-    warning("Not for all model types POI values obtained. ",
-            "Possibly, changing srch_range could solve the issue.")
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of worst case batch (wc_batch_ich)
-  #   and its intercept (wc_icpt_ich)
-
-  # In case of cics model: wc_icpt_ich is the common intercept of all batches
-  #   and none of the batches is the worst case batch.
-  # In case of dids model: wc_batch_ich needs to be determined using the
-  #   models fitted to the data of each batch individually.
-
-  wc_batch_ich <- NA
-  wc_icpt_ich <- NA
-
-  if (!is.na(t_poi[l_model_type[[2]]])) {
-    switch(l_model_type[[2]],
-           "cics" = {
-             if (xform[2] != "no") {
-               wc_icpt_ich <- l_icpt[["cics"]][["icpt.orig"]]
-             } else {
-               wc_icpt_ich <- l_icpt[["cics"]][["icpt"]]
-             }
-           },
-           "dics" = {
-             pred_lim <- get_intvl_limit(x_new = t_poi["dics"],
-                                         model = l_models[["dics"]],
-                                         alpha = alpha, ivl_type = ivl_type,
-                                         ivl_side = ivl_side, ivl = ivl)
-
-             if (sum(is.na(pred_lim)) == 0) {
-               wc_batch_ich <- which.min(abs(sl - pred_lim))
-
-               if (xform[2] != "no") {
-                 wc_icpt_ich <- l_icpt[["dics"]][["icpt.orig"]][wc_batch_ich]
-               } else {
-                 wc_icpt_ich <- l_icpt[["dics"]][["icpt"]][wc_batch_ich]
-               }
-             }
-           },
-           "dids" = {
-             if (sum(is.na(t_poi_dids)) == 0) {
-               wc_batch_ich <- which.min(t_poi_dids)
-
-               if (xform[2] != "no") {
-                 wc_icpt_ich <- l_icpt[["dids"]][["icpt.orig"]][wc_batch_ich]
-               } else {
-                 wc_icpt_ich <- l_icpt[["dids"]][["icpt"]][wc_batch_ich]
-               }
-             }
-           })
-  }
+  l_osle <- get_osle_poi_list(data = d_dat, batch_vbl = batch_vbl,
+                              icpt_list = l_icpt,
+                              model_list = l_models[["Models"]],
+                              sl = sl, srch_range = srch_range, alpha = alpha,
+                              xform = xform, shift = shift, ivl = ivl,
+                              ivl_type = ivl_type, ivl_side = ivl_side, ...)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Back-transformation of POI values, if necessary
+
+  t_poi <- l_osle[["poi"]]
 
   if (xform[1] != "no") {
     switch(xform[1],
@@ -553,28 +413,27 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
   }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Putting parameters into a list
-
-  prms <- list(alpha = alpha,
-               alpha.pool = alpha_pool,
-               ivl = ivl,
-               ivl.type = ivl_type,
-               ivl.side = ivl_side)
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Putting results into a list
 
   structure(list(Data = d_dat,
-                 Parameters = prms,
+                 Parameters = list(alpha = alpha,
+                                   alpha.pool = alpha_pool,
+                                   ivl = ivl,
+                                   ivl.type = ivl_type,
+                                   ivl.side = ivl_side),
                  Variables = l_variables,
-                 Model.Type = l_model_type,
-                 Models = l_models,
-                 AIC = t_AIC,
-                 BIC = t_BIC,
-                 wc.icpt = wc_icpt_ich,
-                 wc.batch = wc_batch_ich,
+                 Model.Type =
+                   check_ancova(data = d_dat, response_vbl = response_vbl,
+                                time_vbl = time_vbl, batch_vbl = batch_vbl,
+                                alpha = alpha_pool),
+                 Models = l_models[["Models"]],
+                 AIC = l_models[["AIC"]],
+                 BIC = l_models[["BIC"]],
+                 wc.icpt = l_osle[["wc.icpt"]],
+                 wc.batch = l_osle[["which.wc.batch"]],
                  Limits = l_lim,
                  Intercepts = l_icpt,
+                 All.POI = l_osle[["all.poi"]],
                  POI = t_poi),
             class = "expirest_osle")
 }
@@ -586,30 +445,41 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 #'
 #' @param model An \sQuote{\code{expirest_osle}} object, i.e. a list returned
 #'   by the \code{\link{expirest_osle}()} function.
-#' @param show_grouping A character string specifying if the grouping of the
-#'   data should be taken into account (\dQuote{yes}) or not (\dQuote{no}),
-#'   i.e. if the results of the most appropriate model should be shown or
-#'   the results from the marginal analysis ignoring the grouping (being
-#'   equivalent with the \emph{common intercept / common slope case}). The
-#'   default is \code{"yes"}.
-#' @param response_vbl_unit A character string specifying the unit associated
-#'   with the response variable. The default is \code{NULL}.
-#' @param y_range A numeric vector of the form \code{c(min, max)} specifying
-#'   the range of the response variable to be plotted.
-#' @param x_range A numeric vector of the form \code{c(min, max)} specifying
-#'   the range of the time  variable to be plotted. The default is \code{NULL}
-#'   and the \eqn{x} range is calculated automatically on the basis of the
-#'   estimated shelf life.
+#' @param show_grouping `r lifecycle::badge("deprecated")`
+#'   `show_grouping = \"yes\" or \"no\"` is no longer supported. Use the
+#'   \code{mtbs} parameter instead which allows choosing a specific model,
+#'   i.e. also the \emph{common intercept / common slope case} model which
+#'   was the default model when \code{show_grouping} was \code{"no"}.
+#' @param response_vbl_unit A character string that specifies the unit
+#'   associated with the response variable. The default is \code{NULL}.
+#' @param x_range A numeric vector of the form \code{c(min, max)} that
+#'   specifies the range of the time variable to be plotted. The default is
+#'   \code{NULL} and the \eqn{x} range is calculated automatically on the basis
+#'   of the estimated shelf life.
+#' @param y_range A numeric vector of the form \code{c(min, max)} that
+#'   specifies the range of the response variable to be plotted. The default
+#'   is \code{NULL} and the \eqn{y} range is calculated automatically on the
+#'   basis of the time course of the response.
+#' @param mtbs A character string that specifies the \dQuote{model to be shown},
+#'   i.e. either \code{verified}, which is the default, or one of \code{cics},
+#'   \code{dics}, \code{dids} or \code{dids.pmse}. The \code{verified} model
+#'   is the model that was identified through the poolability check. It is
+#'   thus also one of the possible optional models. The \code{dids} model
+#'   represents the case where a separate model is fitted to the data of each
+#'   individual batch while the \code{dids.pmse} model is the interaction
+#'   model which includes the \eqn{batch} variable as main effect and in the
+#'   interaction term with the \eqn{time} variable (\eqn{batch \times time}),
+#'   i.e. a model where the mean square error is pooled across batches.
 #' @param plot_option A character string of either \code{"full"} or
-#'   \code{"lean"}, i.e. specifying if all the information should be put out
+#'   \code{"lean"} that specifies if additional information should be put out
 #'   on the plot (option \code{"full"}) or only basic information (option
 #'   \code{"lean"}), i.e. the data points, the fitted regression line with
 #'   the confidence interval, the specification limit(s) and the estimated
 #'   shelf life limit(s). The default is \code{"full"}.
 #' @param ci_app A character string of either \code{"line"} or \code{"ribbon"},
-#'   specifying the appearance of the confidence interval, i.e. if the limits
-#'   should be plotted as lines (option \code{"line"}) or as a shaded ribbon
-#'   (option \code{"ribbon"}). The default is \code{"line"}.
+#'   that specifies the appearance of the confidence interval, i.e. if the
+#'   limits should be plotted as lines (option \code{"line"}) or as a shaded
+#'   ribbon (option \code{"ribbon"}). The default is \code{"line"}.
 #'
 #' @details The function \code{plot_expirest_osle()} uses the data and the
 #' information about the linear model that was used for the estimation of
@@ -636,14 +506,11 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 #' \item{hlines}{A data frame of the horizontal line elements on the plot.}
 #' \item{vlines}{A data frame of the vertical line elements on the plot.}
 #'
-#' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+#' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
+#' \code{\link{plot_expirest_wisle}}.
 #'
 #' @example man/examples/examples_plot_expirest_osle.R
 #'
-#' @importFrom stats lm
-#' @importFrom stats as.formula
-#' @importFrom stats coef
-#' @importFrom stats predict
 #' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 aes
@@ -658,6 +525,7 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 #' @importFrom ggplot2 arrow
 #' @importFrom ggplot2 scale_x_continuous
 #' @importFrom ggplot2 scale_y_continuous
+#' @importFrom ggplot2 coord_cartesian
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 theme_bw
 #' @importFrom ggplot2 guide_legend
@@ -666,31 +534,42 @@ expirest_osle <- function(data, response_vbl, time_vbl, batch_vbl,
 #' @importFrom ggplot2 element_rect
 #' @importFrom ggplot2 element_line
 #' @importFrom ggplot2 unit
+#' @importFrom lifecycle badge
+#' @importFrom lifecycle deprecate_warn
 #'
 #' @export
 
-plot_expirest_osle <- function(
-  model, show_grouping = "yes", response_vbl_unit = NULL, y_range,
-  x_range = NULL, plot_option = "full", ci_app = "line") {
+plot_expirest_osle <- function(model, show_grouping = "yes",
+                               response_vbl_unit = NULL, x_range = NULL,
+                               y_range = NULL, mtbs = "verified",
+                               plot_option = "full", ci_app = "line") {
   if (!inherits(model, "expirest_osle")) {
     stop("The model must be an object of class expirest_osle.")
   }
-  if (!(show_grouping %in% c("yes", "no"))) {
-    stop("Please specify show_grouping either as \"yes\" or \"no\".")
-  }
-  if (!is.numeric(y_range) || length(y_range) != 2) {
-    stop("The parameter y_range must be a vector of length 2.")
-  }
-  if (y_range[1] > y_range[2]) {
-    stop("The parameter y_range must be of the form c(min, max).")
+  if (show_grouping == "no") {
+    lifecycle::deprecate_warn(
+      when = "0.1.7",
+      what = "plot_expirest_osle(show_grouping)",
+      with = "plot_expirest_osle(mtbs)",
+      details =
+        c("If you do not want to see the grouping, use mtbs = \"cics\". ",
+          "If you have set show_grouping = \"no\", mtbs is set to \"cics\".",
+          "If you have set show_grouping = \"yes\", the settings in mtbs
+          apply."))
   }
   if (!is.null(x_range)) {
     if (!is.numeric(x_range) || length(x_range) != 2) {
       stop("The parameter x_range must be a vector of length 2.")
     }
-    if (x_range[1] > x_range[2]) {
-      stop("The parameter x_range must be of the form c(min, max).")
+  }
+  if (!is.null(y_range)) {
+    if (!is.numeric(y_range) || length(y_range) != 2) {
+      stop("The parameter y_range must be a vector of length 2.")
     }
+  }
+  if (!(mtbs %in% c("verified", "cics", "dics", "dids", "dids.pmse"))) {
+    stop("Please specify mtbs either as \"verified\", \"cics\", \"dics\", ",
+         "\"dids\" or \"dids.pmse\".")
   }
   if (!(plot_option %in% c("full", "lean"))) {
     stop("Please specify plot_option either as \"full\" or \"lean\".")
@@ -711,205 +590,77 @@ plot_expirest_osle <- function(
 
   expob <- model
 
+  d_dat <- expob[["Data"]]
+  xform <- expob[["Limits"]][["xform"]]
+
   # Make visible binding for global variable
   LL <- UL <- NULL
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Extraction of models and of the model type
-  # If show_grouping = "no" the model_type is "cics"
-
-  l_models <- expob[["Models"]]
+  # If show_grouping = "no", the model_type is "cics"
 
   if (show_grouping == "yes") {
-    model_name <- expob[["Model.Type"]][["type.acronym"]]
+    model_name <- ifelse(mtbs == "verified",
+                   expob[["Model.Type"]][["type.acronym"]],
+                   mtbs)
   } else {
     model_name <- "cics"
+    mtbs <- "cics"
   }
 
-  # Most appropriate model based on the ANCOVA analysis (show_grouping = "yes")
-  # or marginal model (show_grouping = "no")
-  model <- l_models[[model_name]]
+  # Set model_name to dids if it is n.a.
+  model_name <- ifelse(model_name == "n.a.", "dids", model_name)
 
-  # <-><-><->
   # Checking if estimation of POI.Model or Shelf.Life was successful
-
   t_exp <- expob[["POI"]]
 
-  if (sum(is.na(t_exp)) > 0) {
+  if (any(is.na(t_exp))) {
     stop("Expiry determination was not successful.")
   }
 
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Extraction of data and parameters
-
-  d_dat <- expob[["Data"]]
-
-  alpha <- expob[["Parameters"]][["alpha"]]
-  ivl <- expob[["Parameters"]][["ivl"]]
-  ivl_type <- expob[["Parameters"]][["ivl.type"]]
-  ivl_side <- expob[["Parameters"]][["ivl.side"]]
-
-  if (expob[["Limits"]][["sf.option"]] == "tight") {
-    rl_sf <- expob[["Limits"]][["rl.sf"]]
-    sl_sf <- expob[["Limits"]][["sl.sf"]]
-  } else {
-    rl_sf <- expob[["Limits"]][["rl.sf"]] + 1
-    sl_sf <- expob[["Limits"]][["sl.sf"]] + 1
-  }
-
-  xform <- expob[["Limits"]][["xform"]]
-  shift <- expob[["Limits"]][["shift"]]
-
-  if (sum(xform %in% "no") == 2) {
-    response_vbl <- expob[["Variables"]][["response"]]
-    time_vbl <- expob[["Variables"]][["time"]]
-    batch_vbl <- expob[["Variables"]][["batch"]]
-  }
-  if (sum(xform %in% "no") == 0) {
-    old_response_vbl <- expob[["Variables"]][["response.orig"]]
-    response_vbl <- expob[["Variables"]][["response"]]
-    old_time_vbl <- expob[["Variables"]][["time.orig"]]
-    time_vbl <- expob[["Variables"]][["time"]]
-    batch_vbl <- expob[["Variables"]][["batch"]]
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      response_vbl <- expob[["Variables"]][["response"]]
-      old_time_vbl <- expob[["Variables"]][["time.orig"]]
-      time_vbl <- expob[["Variables"]][["time"]]
-      batch_vbl <- expob[["Variables"]][["batch"]]
-    }
-    if (xform[2] != "no") {
-      old_response_vbl <- expob[["Variables"]][["response.orig"]]
-      response_vbl <- expob[["Variables"]][["response"]]
-      time_vbl <- expob[["Variables"]][["time"]]
-      batch_vbl <- expob[["Variables"]][["batch"]]
-    }
-  }
-
-  # Note: since the predict.lm() function from the 'stats' package always
-  # calculates two-sided limits the value of alpha must be doubled in case that
-  # the ivl_type is "one-sided".
-
-  if (ivl_type == "one.sided") {
-    alpha <- alpha * 2
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Extraction of limits
-
-  l_lim <- expob[["Limits"]]
-
-  sl <- l_lim[["sl"]]
-
   # POI with the upper or lower confidence or prediction interval of the
-  # linear regression model
-  # Most appropriate model
+  # most appropriate model
   poi_model <- t_exp[model_name]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Setting ranges and ticks
-
-  # Find a sequence for a graph with 10 ticks displaying numbers divisible by
-  # 3 and which contains 10 numbers between each tick, i.e. a sequence with a
-  # maximal length of 100. The value of t_min is assumed to be the minimal
-  # observed time_vbl value and t_max the maximal one.
+  # Setting x_range and ticks
+  # For the setting of the y_range, a prediction must be done first
 
   if (!is.null(x_range)) {
-    t_min <- x_range[1]
-    t_max <- x_range[2]
+    x_min <- min(x_range)
+    x_max <- max(x_range)
   } else {
     if (xform[1] == "no") {
-      t_min <- pretty(d_dat[, time_vbl], n = 1)[1]
-      t_max <- pretty(poi_model, n = 1)[2]
+      x_min <- pretty(d_dat[, expob[["Variables"]][["time"]]], n = 1)[1]
+      x_max <- pretty(poi_model, n = 1)[2]
     } else {
-      t_min <- pretty(d_dat[, old_time_vbl], n = 1)[1]
-      t_max <- pretty(poi_model, n = 1)[2]
+      x_min <- pretty(d_dat[, expob[["Variables"]][["time.orig"]]], n = 1)[1]
+      x_max <- pretty(poi_model, n = 1)[2]
     }
   }
 
-  # Setting x_range and the x_breaks where the number of ticks should be 5
-  x_range <- c(t_min, t_max)
-  x_breaks <- pretty(x_range, 5)
-
-  # Setting the y_breaks where the number of ticks should be 5
-  y_breaks <- pretty(y_range, 5)
+  x_range <- c(x_min, x_max)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Prediction based on linear model
 
-  # Generate the new x values (on the original scale) for prediction
-  x_new <- seq(t_min, t_max, length.out = 100)
+  d_pred <- get_predictions(model = expob, model_name = model_name,
+                            x_range = x_range)
 
-  # Transformation of new x values, if necessary
-  switch(xform[1],
-         "no" = {
-         },
-         "log" = {
-           x_new_trfmd <- log(x_new + shift[1])
-         },
-         "sqrt" = {
-           x_new_trfmd <- sqrt(x_new + shift[1])
-         },
-         "sq" = {
-           x_new_trfmd <- (x_new + shift[1])^2
-         })
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Setting y_range and ticks
 
-  # Creation of data frame for the predict.lm() function
-  t_batches <- levels(d_dat[, batch_vbl])
-
-  if (xform[1] == "no") {
-    d_new <- data.frame(rep(t_batches, each = length(x_new)),
-                        rep(x_new, times = length(t_batches)))
+  if (!is.null(y_range)) {
+    y_min <- min(y_range)
+    y_max <- max(y_range)
   } else {
-    d_new <- data.frame(rep(t_batches, each = length(x_new_trfmd)),
-                        rep(x_new_trfmd, times = length(t_batches)))
+    tmp <- pretty(c(d_pred$LL, d_pred$UL), n = 1)
+    y_min <- tmp[1]
+    y_max <- tmp[length(tmp)]
   }
 
-  colnames(d_new) <- c(batch_vbl, time_vbl)
-
-  # Prediction
-  m_pred <- predict(model, newdata = d_new, interval = ivl,
-                    level = 1 - alpha)
-
-  # Back-transformation of predicted (response) values, if necessary
-  switch(xform[2],
-         "no" = {
-         },
-         "log" = {
-           m_pred <- exp(m_pred) - shift[2]
-         },
-         "sqrt" = {
-           m_pred <- m_pred^2 - shift[2]
-         },
-         "sq" = {
-           m_pred[m_pred < 0] <- NA
-           m_pred <- sqrt(m_pred) - shift[2]
-         })
-
-  # Generation of data frame for plotting (with x values in original scale)
-  if (sum(xform %in% "no") == 2) {
-    d_pred <- as.data.frame(cbind(d_new, m_pred))
-    colnames(d_pred) <- c(batch_vbl, time_vbl, response_vbl, "LL", "UL")
-  }
-  if (sum(xform %in% "no") == 0) {
-    d_pred <- data.frame(rep(t_batches, each = length(x_new)),
-                         rep(x_new, times = length(t_batches)),
-                         m_pred)
-    colnames(d_pred) <- c(batch_vbl, old_time_vbl, old_response_vbl, "LL", "UL")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      d_pred <- data.frame(rep(t_batches, each = length(x_new)),
-                           rep(x_new, times = length(t_batches)),
-                           m_pred)
-      colnames(d_pred) <- c(batch_vbl, old_time_vbl, response_vbl, "LL", "UL")
-    }
-    if (xform[2] != "no") {
-      d_pred <- as.data.frame(cbind(d_new, m_pred))
-      colnames(d_pred) <- c(batch_vbl, time_vbl, old_response_vbl, "LL", "UL")
-    }
-  }
+  y_range <- c(y_min, y_max)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Generation of ancillary data frames for plotting
@@ -920,131 +671,42 @@ plot_expirest_osle <- function(
   # (position in brackets):
   # LSL (lower right), USL (upper right), POI model (low at poi.model)
 
-  if (length(sl) == 2) {
-    d_text <- data.frame(
-      Time = c(rep(x_range[2], 2), poi_model),
-      Response = c(sl, sl[1]),
-      Label = c(print_val("LSL: ", sl[1], rvu, sl_sf[1]),
-                print_val("USL: ", sl[2], rvu, sl_sf[2]),
-                print_val("", poi_model, "", get_n_whole_part(poi_model) + 1)),
-      Colour = c("black", "black", "forestgreen"),
-      stringsAsFactors = FALSE)
-
-    d_text$Response <- d_text$Response +
-      rep(diff(y_breaks[1:2]), 3) * 1 / c(-10, 10, -2)
-  } else {
-    switch(ivl_side,
-           "lower" = {
-             d_text <- data.frame(
-               Time = c(x_range[2], poi_model),
-               Response = rep(sl, 2),
-               Label =
-                 c(print_val("LSL: ", sl, rvu, sl_sf),
-                   print_val("", poi_model, "",
-                             get_n_whole_part(poi_model) + 1)),
-               Colour = c("black", "forestgreen"),
-               stringsAsFactors = FALSE)
-
-             d_text$Response <- d_text$Response +
-               rep(diff(y_breaks[1:2]), 2) * 1 / c(-10, -2)
-           },
-           "upper" = {
-             d_text <- data.frame(
-               Time = c(x_range[2], poi_model),
-               Response = rep(sl, 2),
-               Label =
-                 c(print_val("USL: ", sl, rvu, sl_sf),
-                   print_val("", poi_model, "",
-                             get_n_whole_part(poi_model) + 1)),
-               Colour = c("black", "forestgreen"),
-               stringsAsFactors = FALSE)
-
-             d_text$Response <- d_text$Response +
-               rep(diff(y_breaks[1:2]), 2) * 1 / c(10, 2)
-           })
-  }
-
-  if (sum(xform %in% "no") == 2) {
-    colnames(d_text) <- c(time_vbl, response_vbl, "Label", "Colour")
-  }
-  if (sum(xform %in% "no") == 0) {
-    colnames(d_text) <- c(old_time_vbl, old_response_vbl, "Label", "Colour")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      colnames(d_text) <- c(old_time_vbl, response_vbl, "Label", "Colour")
-    }
-    if (xform[2] != "no") {
-      colnames(d_text) <- c(time_vbl, old_response_vbl, "Label", "Colour")
-    }
-  }
+  d_text <- get_text_annotation(model = expob, rvu = rvu, x_range = x_range,
+                                y_range = y_range, mtbs = mtbs,
+                                plot_option = plot_option)
 
   # <-><-><->
   # d_hlines - display of horizontal lines
 
-  if (length(sl) == 2) {
-    d_hlines <- data.frame(Response = sl,
-                           Item = c("LSL", "USL"),
-                           Colour = as.character(c("black", "black")),
-                           Type = as.character(c("dotted", "dotted")),
-                           stringsAsFactors = FALSE)
-  } else {
-    switch(ivl_side,
-           "lower" = {
-             d_hlines <- data.frame(Response = sl,
-                                    Item = c("LSL"),
-                                    Colour = as.character(c("black")),
-                                    Type = as.character(c("dotted")),
-                                    stringsAsFactors = FALSE)
-           },
-           "upper" = {
-             d_hlines <- data.frame(Response = sl,
-                                    Item = c("USL"),
-                                    Colour = as.character(c("black")),
-                                    Type = as.character(c("dotted")),
-                                    stringsAsFactors = FALSE)
-           })
-  }
-
-  if (xform[2] != "no") {
-    colnames(d_hlines) <- c(old_response_vbl, "Item", "Colour", "Type")
-  } else {
-    colnames(d_hlines) <- c(response_vbl, "Item", "Colour", "Type")
-  }
+  d_hlines <- get_hlines(model = expob)
 
   # <-><-><->
   # d_vlines - display of vertical lines
 
-  d_vlines <- data.frame(Month = c(poi_model),
-                         Item = c("poi.model"),
-                         Colour = c("forestgreen"),
-                         Type = c("dotdash"),
-                         stringsAsFactors = FALSE)
-
-  if (xform[1] != "no") {
-    colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
-  } else {
-    colnames(d_vlines) <- c(time_vbl, "Item", "Colour", "Type")
-  }
+  d_vlines <- get_vlines(model = expob, mtbs = mtbs)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Generation of ggplot object
 
-  # Resetting time_vbl and response_vbl, if necessary
+  # Setting variable names
+  time_vbl <- expob[["Variables"]][["time"]]
+  response_vbl <- expob[["Variables"]][["response"]]
+  batch_vbl <- expob[["Variables"]][["batch"]]
+
   if (sum(xform %in% "no") == 0) {
-    time_vbl <- old_time_vbl
-    response_vbl <- old_response_vbl
+    time_vbl <- expob[["Variables"]][["time.orig"]]
+    response_vbl <- expob[["Variables"]][["response.orig"]]
   }
   if (sum(xform %in% "no") == 1) {
     if (xform[1] != "no") {
-      time_vbl <- old_time_vbl
+      time_vbl <- expob[["Variables"]][["time.orig"]]
     }
     if (xform[2] != "no") {
-      response_vbl <- old_response_vbl
+      response_vbl <- expob[["Variables"]][["response.orig"]]
     }
   }
 
-  if (show_grouping == "no") {
+  if (model_name == "cics") {
     ggraph <-
       ggplot(d_dat,
              aes(x = .data[[time_vbl]], y = .data[[response_vbl]])) +
@@ -1100,7 +762,7 @@ plot_expirest_osle <- function(
                                fill = .data[[batch_vbl]]), alpha = 0.25)
            })
 
-    ggraph <- ggraph + theme(legend.position = c(0.04, 0.96),
+    ggraph <- ggraph + theme(legend.position.inside = c(0.04, 0.96),
                              legend.justification = c(0.1, 1),
                              legend.text = element_text(size = 11),
                              legend.title = element_blank(),
@@ -1114,8 +776,7 @@ plot_expirest_osle <- function(
                colour = d_hlines$Colour, linetype = d_hlines$Type) +
     geom_vline(xintercept = d_vlines[, time_vbl],
                colour = d_vlines$Colour, linetype = d_vlines$Type) +
-    scale_x_continuous(limits = x_range, breaks = x_breaks) +
-    scale_y_continuous(limits = y_range, breaks = y_breaks) +
+    coord_cartesian(xlim = x_range, ylim = y_range) +
     theme_bw()  +
     theme(panel.grid.major = element_line(colour = "grey90"),
           panel.grid.minor = element_blank(),
@@ -1136,7 +797,7 @@ plot_expirest_osle <- function(
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Collecting the results
 
-  invisible(structure(list(Model = model,
+  invisible(structure(list(Model = expob[["Models"]][[model_name]],
                            Expiry = t_exp,
                            Graph = ggraph,
                            Prediction = d_pred,

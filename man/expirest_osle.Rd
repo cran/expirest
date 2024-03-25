@@ -16,7 +16,7 @@ expirest_osle(
   alpha_pool = 0.25,
   xform = c("no", "no"),
   shift = c(0, 0),
-  sf_option = "loose",
+  sf_option = "tight",
   ivl = "confidence",
   ivl_type = "one.sided",
   ivl_side = "lower",
@@ -27,44 +27,45 @@ expirest_osle(
 \item{data}{A data frame with the columns specified by \code{response_vbl},
 \code{time_vbl} and \code{batch_vbl}.}
 
-\item{response_vbl}{A character string specifying the response variable name
+\item{response_vbl}{A character string that specifies the response variable
+name that must be a column of \code{data}.}
+
+\item{time_vbl}{A character string that specifies the time variable name
 that must be a column of \code{data}.}
 
-\item{time_vbl}{A character string specifying the time variable name that
-must be a column of \code{data}.}
-
-\item{batch_vbl}{A character string specifying the column in \code{data}
+\item{batch_vbl}{A character string that specifies the column in \code{data}
 with the grouping information (i.e. a factorial variable) for the
-differentiation of the observations of the different batches.}
+differentiation of the observations of the various batches.}
 
-\item{sl}{A numeric value or a numeric vector of length \code{2} specifying
-the specification limit or limits. If a vector is provided it must be of
-the form \code{c(lower limit, upper limit)}.}
+\item{sl}{A numeric value or a numeric vector of length \code{2} that
+specifies the specification limit or limits. If a vector is provided it
+must be of the form \code{c(lower limit, upper limit)}.}
 
-\item{sl_sf}{A positive integer or a vector of positive integers specifying
-the number of \dQuote{significant figures} (sf) of \code{sl}. It must have
-the same length as \code{sl}.}
+\item{sl_sf}{A positive integer or a vector of positive integers that
+specifies the number of \dQuote{significant figures} (sf) of \code{sl}.
+It must have the same length as \code{sl}.}
 
-\item{srch_range}{A vector of length \code{2} specifying the end-points of
-the (time) range that is supposed to contain the shelf life or retest
+\item{srch_range}{A vector of length \code{2} that specifies the end-points
+of the (time) range that is supposed to contain the shelf life or retest
 period.}
 
-\item{alpha}{A numeric value between 0 and 1 specifying the significance
+\item{alpha}{A numeric value between 0 and 1 that specifies the significance
 level for the calculation of confidence or prediction intervals. The
 default is \code{0.05}.}
 
-\item{alpha_pool}{A numeric value between 0 and 1 specifying the type I
+\item{alpha_pool}{A numeric value between 0 and 1 that specifies the type I
 error rate for the test of the poolability of the batches. The default
 is \code{0.25}, following ICH Q1E guideline. The value should not be
 changed unless supported by well-founded reasons.}
 
-\item{xform}{A vector of two character strings specifying the transformation
-of the response and the time variable. The default is \dQuote{no}
-transformation, i.e. \code{c("no", "no")}, where the first element
-specifies the transformation of the \eqn{x} variable and the second
-element the transformation of the \eqn{y} variable. Valid alternatives
-for \eqn{x} and/or \eqn{y} variable transformation are \code{"log"}
-(natural logarithm), \code{"sqrt"} (square root) and \code{"sq"} (square).}
+\item{xform}{A vector of two character strings that specifies the
+transformation of the response and the time variable. The default is
+\dQuote{no} transformation, i.e. \code{c("no", "no")}, where the first
+element specifies the transformation of the \eqn{x} variable and the
+second element the transformation of the \eqn{y} variable. Valid
+alternatives for \eqn{x} and/or \eqn{y} variable transformation are
+\code{"log"} (natural logarithm), \code{"sqrt"} (square root) and
+\code{"sq"} (square).}
 
 \item{shift}{A vector of two values which will be added to the variables
 \eqn{x} and/or \eqn{y} before they are transformed as specified by the
@@ -74,30 +75,32 @@ purpose is to prevent an undefined state which could arise when variables
 with values of \eqn{\leq 0} are log or square root transformed. The
 default is \code{c(0, 0)}.}
 
-\item{sf_option}{A character string specifying if the limits (\code{rl}
+\item{sf_option}{A character string that specifies if the limits (\code{rl}
 or \code{sl}) should be regarded as \dQuote{tight} or \dQuote{loose}, i.e.
-either \code{"tight"} or \code{"loose"}, respectively. The option
-\code{"tight"} means that the limits are rounded to the specified number
-of significant figures specified by the parameters \code{rl_sf} and
-\code{sl_sf}. In case of the option \code{"loose"} the limits are rounded
-to the specified number of significant figures (\eqn{n}), followed by the
-subtraction of \eqn{1} from the \eqn{n^{th}} digit and addition of
-\eqn{5} to the \eqn{(n + 1)^{th}} digit if \code{ivl_side} is
-\code{"lower"}, or followed by the addition of \eqn{4} to the
-\eqn{(n + 1)^{th}} digit if \code{ivl_side} is \code{"upper"}.}
+either \code{"tight"} or \code{"loose"}, respectively. The default is
+\code{"tight"}. The option \code{"tight"} means that the limits are
+rounded to the number of significant digits specified by the parameters
+\code{rl_sf} and \code{sl_sf}. If \code{sf_option = "loose"}, four on
+the order of the last significant digit + 1 is added if
+\code{ivl_side = "upper"} or five on the order of the last significant
+digit + 1 is subtracted if \code{ivl_side = "upper"}.}
 
 \item{ivl}{A character string of either \code{"confidence"} or
-\code{"prediction"}, i.e. specifying the type of interval of interest.
+\code{"prediction"} that specifies the type of interval of interest.
 The default is \code{"confidence"}.}
 
-\item{ivl_type}{A character string specifying if a \dQuote{one sided} or
-a \dQuote{two sided} interval should be calculated, i.e. either
+\item{ivl_type}{A character string that specifies if a \dQuote{one sided}
+or a \dQuote{two sided} interval should be calculated, i.e. either
 \code{"one.sided"} or \code{"two.sided"}, respectively. The default is
 \code{"one.sided"}.}
 
-\item{ivl_side}{A character string specifying if the \dQuote{upper} or the
-\dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"} or
-\code{"lower"}, respectively. The default is \code{"lower"}.}
+\item{ivl_side}{A character string that specifies if the specification
+limit, given that the limit has only one side, is an \dQuote{upper} or a
+\dQuote{lower} bound, i.e. it is specified as either \code{"upper"} or
+\code{"lower"}, respectively. The default is \code{"lower"}. If the
+specification has two boundaries, then this parameter specifies the
+preferred side. If no side is preferred over the other, \code{"both"} can
+be used.}
 
 \item{...}{Additional named or unnamed arguments passed on to
 \code{uniroot()}.}
@@ -112,34 +115,42 @@ containing the following elements:
 \item{Variables}{A list of the variable names, i.e. the original names of
   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
   applicable, of the transformed variables.}
-\item{Model.Type}{A list of five elements specifying which model, based on
-  the ANCOVA analysis, suits best. The first element (\code{type.spec})
-  is a numeric vector of length 2 specifying the best model accepted at the
-  significance level of 0.25. The first number represents the decision on
-  the intercept and the second on the slope, where \code{1} stands for
-  \dQuote{common} and \code{2} stands for \dQuote{different}. The second
-  element (\code{type.acronym}) is an acronym representing the first item.}
+\item{Model.Type}{A list of two elements that specifies which model, based
+  on the ANCOVA analysis, suits best. The first element (\code{type.spec})
+  is a numeric vector of length 2 that specifies the best model accepted at
+  the significance level specified by \code{alpha.pool}. The first number
+  represents the decision on the intercept and the second on the slope,
+  where \code{1} stands for \dQuote{common} and \code{2} stands for
+  \dQuote{different}. The second element (\code{type.acronym}) is an acronym
+  representing the first item.}
 \item{Models}{A list of four elements named \code{cics}, \code{dics},
-  \code{dids} and \code{individual}. The first three elements contain the
+  \code{dids.pmse} and \code{dids}. The first three elements contain the
   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
   and \dQuote{different intercept / different slope} (\code{dids}) models.
-  The fourth element is a list of the \sQuote{\code{lm}} objects of the
-  models obtained from fitting the data of each batch individually.}
+  The fourth element is a list of the \sQuote{\code{lm}} objects that is
+  obtained from fitting a regression model to the data of each level of the
+  categorical variable separately. The \code{cics}, \code{dics} and
+  \code{dids.pmse} elements are \code{NA} if data of only a single batch
+  is available.}
 \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
-  values of each of the three fitted models.}
+  values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
-  values of each of the three fitted models.}
-\item{wc.icpt}{A numeric value of the worst case intercept.}
-\item{wc.batch}{A numeric value of the worst case batch. In case of the
- \code{dids} model type, the estimation is done using the models obtained
- from fitting the data of each batch individually.}
+  values of each of the \code{cics}, \code{dics} and \code{dids.pmse}
+  models.}
+\item{wc.icpt}{A numeric named vector of the worst case intercepts. The
+  information about which limit the corresponding confidence interval
+  crosses is stored in the attribute named \code{side}.}
+\item{wc.batch}{A numeric named vector of the batches with the worst case
+  intercepts. The information about which limit the corresponding confidence
+  interval crosses is stored in the attribute named \code{side}.}
 \item{Limits}{A list of all limits.}
-\item{Intercepts}{A list of the intercepts of the three fitted models.}
-\item{POI}{A numeric named vector of the POI values of each of the three
-  fitted models. In case of the \code{dids} model type, the estimation is
-  done using the models obtained from fitting the data of each
-  batch individually.}
+\item{Intercepts}{A list of the intercepts of all models.}
+\item{All.POI}{A list of two elements named \code{lower} and \code{upper}
+  that contain either NA or lists of the POI values of all models.}
+\item{POI}{A numeric named vector of the POI values of the worst case
+  batches of each model. The information about which limit the corresponding
+  confidence interval crosses is stored in the attribute named \code{side}.}
 }
 \description{
 Based on a linear regression model fitted to a stability data set the
@@ -150,7 +161,7 @@ following the ICH Q1E guideline. The abbreviation \dQuote{osle} stands for
 \details{
 According to ICH Q1E guideline, \dQuote{\emph{an appropriate
 approach to retest period or shelf life estimation is to analyse a
-quantitative  attribute by determining the earliest time at which the 95
+quantitative attribute by determining the earliest time at which the 95
 percent confidence limit for the mean intersects the proposed acceptance
 criterion}} (in this package, this point is called the \dQuote{point of
 intersection} (POI)). Furthermore, it says that \dQuote{\emph{for an
@@ -158,15 +169,19 @@ attribute known to increase with time, the upper one-sided 95 percent
 confidence limit should be compared to the acceptance criterion. For an
 attribute that can either increase or decrease, or whose direction of change
 is not known, two-sided 95 percent confidence limits should be calculated
-and compared to the upper and lower acceptance criteria.}} With respect to
-the number of batches to be included in the analysis it says that
-\dQuote{\emph{the retest period or shelf life is generally estimated based
-on the stability data from a minimum of three batches.}}
+and compared to the upper and lower acceptance criteria.}} The approach
+can be used to estimate the retest period or shelf life for a single batch
+or for multiple batches. According to the guideline, \dQuote{\emph{for a
+drug substance or for a drug product available in a single strength and a
+single container size and/or fill, the retest period or shelf life is
+generally estimated based on the stability data from a minimum of three
+batches.}}
 
-Before performing the retest period or shelf life estimation the most
-suitable model should be determined. It should particularly be verified
-if data of all test batches are poolable or not. Details on this are
-described in section \dQuote{Checking batch poolability} below.
+Before performing the retest period or shelf life estimation with results
+from multiple batches, the most suitable model should be determined. It
+should particularly be verified if data of all test batches are poolable or
+not. Details on this are described in section \dQuote{Checking batch
+poolability} below.
 }
 \section{Checking batch poolability}{
 
@@ -174,7 +189,7 @@ According to ICH Q1E guideline, construction of the 95\% confidence interval
 on the basis of the combined data of all test batches is allowed only if it
 has been confirmed by aid of a statistical test whether the regression lines
 from the different batches have a common slope and a common intercept. A
-significance level of \code{alpha_pool = 0.25} has to be used for both
+significance level of \code{alpha_pool = 0.25} should to be used for both
 batch-related terms, and the test of the slopes has to precede the test of
 the intercepts. From these tests, three possible models may be appropriate,
 i.e.
@@ -184,14 +199,20 @@ i.e.
  \item a \emph{different intercept / different slope} model (dids).
 }
 The \emph{common intercept / different slope} model is not of practical
-relevance because the corresponding model is missing an effect. If the slopes
-are significantly different, there is no point comparing intercepts.
+relevance because the corresponding model is missing an effect. If the
+slopes are significantly different, there is no point comparing intercepts.
+The dids model has individual intercepts and individual slopes, and the
+calculation of confidence intervals is based on the corresponding individual
+mean square errors. The \emph{different intercept / different slope} model
+where the mean square error is pooled across batches is reported as
+dids.pmse.
 
 These requirements can be checked by aid of an \dQuote{ANalysis of
-COVAriance} (ANCOVA) including the batch variable as interaction term. The
-full ANCOVA model simultaneously tests all the effects, and non-significant
-effects can be identified and removed for fitting of the final regression
-model that is used for the estimation of the shelf life or retest period.
+COVAriance} (ANCOVA) including the batch variable as main effect and as
+\eqn{batch \times time} interaction term. The full ANCOVA model
+simultaneously tests all the effects, and non-significant effects can be
+identified and removed for fitting of the final regression model that is
+used for the estimation of the shelf life or retest period.
 
 The significance level (\code{alpha_pool = 0.25}, Type I error) is used to
 increase the power of the test to detect cases where the data should not be
@@ -203,20 +224,13 @@ appropriate.
 }
 
 \examples{
-# Potency stability data (in \% of label claim (LC)) of five batches of a drug
-# product obtained over a 24 months period:
-str(exp1)
-
-# 'data.frame':	53 obs. of  3 variables:
-# $ Batch  : Factor w/ 6 levels "b2","b3","b4",..: 1 1 1 1 1 1 1 1 1 1 ...
-# $ Month  : num  0 1 3 3 6 6 12 12 24 24 ...
-# $ Potency: num  101 101.3 99.8 99.2 99.5 ...
-
 # Successful estimations
+# A model with common intercepts / common slopes (cics)
 res1 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
                 response_vbl = "Potency", time_vbl = "Month",
-                batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500))
+                batch_vbl = "Batch", sl = 95, sl_sf = 3,
+                srch_range = c(0, 500), sf_option = "loose")
 res1$Model.Type
 res1$POI
 
@@ -229,13 +243,23 @@ res1$POI
 # [1] "cics"
 
 # Expected results in res1$POI
-#     cics     dics     dids
-# 26.22410 24.80030 23.34184
+#     cics      dics dids.pmse      dids
+# 26.22410  24.80030  23.66724  23.34184
+# attr(,"side")
+#     cics      dics dids.pmse      dids
+#  "lower"   "lower"   "lower"   "lower"
 
+# The parameter settings sf_option = "loose" and ivl_side = "lower" (the
+# default setting of ivl_side) cause the specification limit of 95.0
+# (sl_sf = 3, i.e. 3 significant digits) to be reduced by 0.05, i.e. the
+# actual specification limit is 94.95.
+
+# A model with different intercepts / different slopes (dids)
 res2 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b4", "b5", "b8"), ],
                 response_vbl = "Potency", time_vbl = "Month",
-                batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500))
+                batch_vbl = "Batch", sl = 95, sl_sf = 3,
+                srch_range = c(0, 500), sf_option = "loose")
 res2$Model.Type
 res2$POI
 
@@ -248,42 +272,105 @@ res2$POI
 # [1] "dids"
 
 # Expected results in res2$POI
-#     cics     dics     dids
-# 28.12518 22.47939 15.96453
+#     cics      dics dids.pmse      dids
+# 28.12518  22.47939  15.72348  15.96453
+# attr(,"side")
+#     cics      dics dids.pmse      dids
+#  "lower"   "lower"   "lower"   "lower"
 
-# Moisture stability data (\% (w/w)) of three batches of a drug product obtained
-# over a 24 months period:
-str(exp3)
-
-# 'data.frame':	33 obs. of  3 variables:
-# $ Batch   : Factor w/ 3 levels "b1","b2","b3": 1 1 1 1 1 1 1 1 1 1 ...
-# $ Month   : num  0 1 2 3 3 6 6 12 12 24 ...
-# $ Moisture: num  2.2 1.7 3.32 2.76 2.43 ...
-
-# Unsuccessful estimations
-# Intervals are wider than the specification limits (no intersection)
+# Estimation where it is not know a priori which limit is crossed first, i.e.
+# letting the estimation be done for both specification limits.
 res3 <-
   expirest_osle(
     data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-    batch_vbl = "Batch", sl = 1.5, sl_sf = 2, srch_range = c(0, 500),
-    sf_option = "tight", ivl = "prediction", ivl_type = "two.sided",
-    ivl_side = "lower")
+    batch_vbl = "Batch", sl = c(1.5, 3.5), sl_sf = c(2, 2),
+    srch_range = c(0, 500), sf_option = "loose", ivl = "confidence",
+    ivl_type = "two.sided", ivl_side = "both")
+res3$Model.Type
 res3$POI
 
-# (Expected) results in res3$POI
-# cics dics dids
-#   NA   NA   NA
+# Expected results in res3$Model.Type
+# $type.spec
+# common.icpt  common.slp
+#           1           1
+#
+# $type.acronym
+# [1] "cics"
 
-# Estimation may also fail because of an inappropriate 'srch-range' setting.
+# Expected results in res3$POI
+#     cics      dics dids.pmse      dids
+# 46.85172  41.84802  22.41808  22.50966
+# attr(,"side")
+#     cics      dics dids.pmse      dids
+#  "upper"   "upper"   "upper"   "lower"
+
+# The parameter settings sf_option = "loose" and ivl_side = "both" (the
+# default setting of ivl_side) cause the specification limits of 1.5 and 3.5
+# (sl_sf = 2, i.e. 2 significant digits) to be reduced by 0.05 and increased
+# by 0.04, respectively, i.e. the actual specification limits are 1.45 and
+# 3.54, respectively.
+
+# Analysis with a single batch
 res4 <-
-  expirest_osle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
-                response_vbl = "Potency", time_vbl = "Month",
-                batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 5))
+  expirest_osle(
+    data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+    time_vbl = "Month", batch_vbl = "Batch", sl = c(1.5, 3.5),
+    sl_sf = c(2, 2), srch_range = c(0, 500), sf_option = "tight",
+    ivl = "confidence", ivl_type = "two.sided", ivl_side = "both")
+
+# Since only one batch is involved there is no model type. Nevertheless, the
+# result is reported under the dids model name.
+res4$Model.Type
 res4$POI
 
-# (Expected) results in res4$POI
-# cics dics dids
-#   NA   NA   NA
+# Expected results in res4$Model.Type
+# $type.spec
+# common.icpt  common.slp
+#         NA           NA
+#
+# $type.acronym
+# [1] "n.a."
+
+# Expected results in res4$POI
+# cics      dics dids.pmse      dids
+#   NA        NA        NA  21.42596
+# attr(,"side")
+# cics      dics dids.pmse      dids
+# "NA"      "NA"      "NA"   "lower"
+
+# Unsuccessful estimations
+\dontrun{
+  # Intervals are wider than the specification limits (no intersection).
+  res5 <-
+    expirest_osle(
+      data = exp3, response_vbl = "Moisture", time_vbl = "Month",
+      batch_vbl = "Batch", sl = 1.5, sl_sf = 2, srch_range = c(0, 500),
+      sf_option = "tight", ivl = "prediction", ivl_type = "two.sided",
+      ivl_side = "lower")
+  res5$POI
+
+  # (Expected) results in res5$POI
+  #    cics      dics dids.pmse      dids
+  #     NA        NA        NA        NA
+  # attr(,"side")
+  #    cics      dics dids.pmse      dids
+  # "lower"   "lower"   "lower"   "lower"
+
+  # Estimation may also fail because of an inappropriate 'srch_range' setting.
+  res6 <-
+    expirest_osle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
+                  response_vbl = "Potency", time_vbl = "Month",
+                  batch_vbl = "Batch", sl = 95, sl_sf = 3,
+                  srch_range = c(0, 5))
+  res6$POI
+
+  # (Expected) results in res6$POI
+  #    cics      dics dids.pmse      dids
+  #     NA        NA        NA        NA
+  # attr(,"side")
+  #    cics      dics dids.pmse      dids
+  # "lower"   "lower"   "lower"   "lower"
+}
 }
 \references{
 International Council for Harmonisation of Technical Requirements for
@@ -292,7 +379,6 @@ Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 (CPMP/ICH/420/02).
 }
 \seealso{
-\code{\link{expirest_wisle}}, \code{\link{find_poi}},
-\code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
-\code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
+\code{\link{expirest_wisle}}, \code{\link[stats]{uniroot}},
+\code{\link[stats]{lm}}, \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
 }

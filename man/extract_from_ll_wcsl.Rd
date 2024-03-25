@@ -8,20 +8,20 @@ extract_from_ll_wcsl(ll, element)
 }
 \arguments{
 \item{ll}{A list of lists returned by the \code{\link{get_wcs_limit}()}
-function. The list must have three elements named \code{"cics"},
-\code{"dics"} and \code{"dids"}. Each of these elements have a sub-list
-of the same length as the number of intercepts. Each of these sub-lists
-has a sub-sub-list of the same length as the number of release limits
-(\code{rl}).}
+function. The list must have four elements named \code{"cics"},
+\code{"dics"}, \code{dids.pmse} and \code{"dids"}. Each of these elements
+has a sub-list of the same length as the number of intercepts. And each
+of these elements has a sub-sub-list of the same length as the number of
+release limits (\code{rl}).}
 
-\item{element}{A character string specifying the element to be extracted,
+\item{element}{A character string that specifies the element to be extracted,
 i.e. either one of  \code{"delta.lim"}, \code{"delta.lim.orig"},
 \code{"wcs.lim"} or \code{"wcs.lim.orig"}.}
 }
 \value{
 A list of the same length as \code{ll_wcsl} is returned. The
 individual elements of the list are matrices of the values specified by
-\code{element} that have been extracted from \code{x}.
+\code{element} that have been extracted from \code{ll}.
 }
 \description{
 The function \code{extract_from_ll_wcsl()} extracts specific elements from
@@ -33,6 +33,6 @@ aid of the function \code{\link{get_wcs_limit}()} for a set of release
 limit values (\code{rl}) and intercepts.
 }
 \seealso{
-\code{\link{get_wcs_limit}()}.
+\code{\link{get_wcs_limit}}.
 }
 \keyword{internal}

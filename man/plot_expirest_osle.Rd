@@ -8,8 +8,9 @@ plot_expirest_osle(
   model,
   show_grouping = "yes",
   response_vbl_unit = NULL,
-  y_range,
   x_range = NULL,
+  y_range = NULL,
+  mtbs = "verified",
   plot_option = "full",
   ci_app = "line"
 )
@@ -18,35 +19,47 @@ plot_expirest_osle(
 \item{model}{An \sQuote{\code{expirest_osle}} object, i.e. a list returned
 by the \code{\link{expirest_osle}()} function.}
 
-\item{show_grouping}{A character string specifying if the grouping of the
-data should be taken into account (\dQuote{yes}) or not (\dQuote{no}),
-i.e. if the results of the most appropriate model should be shown or
-the results from the marginal analysis ignoring the grouping (being
-equivalent with the \emph{common intercept / common slope case}). The
-default is \code{"yes"}.}
+\item{show_grouping}{`r lifecycle::badge("deprecated")`
+`show_grouping = \"yes\" or \"no\"` is no longer supported. Use the
+\code{mtbs} parameter instead which allows choosing a specific model,
+i.e. also the \emph{common intercept / common slope case} model which
+was the default model when \code{show_grouping} was \code{"no"}.}
 
-\item{response_vbl_unit}{A character string specifying the unit associated
-with the response variable. The default is \code{NULL}.}
+\item{response_vbl_unit}{A character string that specifies the unit
+associated with the response variable. The default is \code{NULL}.}
 
-\item{y_range}{A numeric vector of the form \code{c(min, max)} specifying
-the range of the response variable to be plotted.}
+\item{x_range}{A numeric vector of the form \code{c(min, max)} that
+specifies the range of the time variable to be plotted. The default is
+\code{NULL} and the \eqn{x} range is calculated automatically on the basis
+of the estimated shelf life.}
 
-\item{x_range}{A numeric vector of the form \code{c(min, max)} specifying
-the range of the time  variable to be plotted. The default is \code{NULL}
-and the \eqn{x} range is calculated automatically on the basis of the
-estimated shelf life.}
+\item{y_range}{A numeric vector of the form \code{c(min, max)} that
+specifies the range of the response variable to be plotted. The default
+is \code{NULL} and the \eqn{y} range is calculated automatically on the
+basis of the time course of the response.}
+
+\item{mtbs}{A character string that specifies the \dQuote{model to be shown},
+i.e. either \code{verified}, which is the default, or one of \code{cics},
+\code{dics}, \code{dids} or \code{dids.pmse}. The \code{verified} model
+is the model that was identified through the poolability check. It is
+thus also one of the possible optional models. The \code{dids} model
+represents the case where a separate model is fitted to the data of each
+individual batch while the \code{dids.pmse} model is the interaction
+model which includes the \eqn{batch} variable as main effect and in the
+interaction term with the \eqn{time} variable (\eqn{batch \times time}),
+i.e. a model where the mean square error is pooled across batches.}
 
 \item{plot_option}{A character string of either \code{"full"} or
-\code{"lean"}, i.e. specifying if all the information should be put out
+\code{"lean"} that specifies if additional information should be put out
 on the plot (option \code{"full"}) or only basic information (option
 \code{"lean"}), i.e. the data points, the fitted regression line with
 the confidence interval, the specification limit(s) and the estimated
 shelf life limit(s). The default is \code{"full"}.}
 
 \item{ci_app}{A character string of either \code{"line"} or \code{"ribbon"},
-specifying the appearance of the confidence interval, i.e. if the limits
-should be plotted as lines (option \code{"line"}) or as a shaded ribbon
-(option \code{"ribbon"}). The default is \code{"line"}.}
+that specifies the appearance of the confidence interval, i.e. if the
+limits should be plotted as lines (option \code{"line"}) or as a shaded
+ribbon (option \code{"ribbon"}). The default is \code{"line"}.}
 }
 \value{
 An object of class \sQuote{\code{plot_expirest_osle}} is returned
@@ -80,60 +93,64 @@ the list that is returned by \code{\link{plot_expirest_osle}()} and can be
 used to modify the appearance of the graph.
 }
 \examples{
-# Potency stability data (in \% of label claim (LC)) of five batches of a drug
-# product obtained over a 24 months period:
-str(exp1)
-
-# 'data.frame':	53 obs. of  3 variables:
-# $ Batch  : Factor w/ 6 levels "b2","b3","b4",..: 1 1 1 1 1 1 1 1 1 1 ...
-# $ Month  : num  0 1 3 3 6 6 12 12 24 24 ...
-# $ Potency: num  101 101.3 99.8 99.2 99.5 ...
-
 # Start by making an "ordinary shelf life estimation" (osle).
 res1 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b2", "b5", "b7"), ],
                 response_vbl = "Potency", time_vbl = "Month",
-                batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500))
+                batch_vbl = "Batch", sl = 95, sl_sf = 3,
+                srch_range = c(0, 500), sf_option = "loose")
 
 # Pass the 'expirest_osle' object on to the plot_expirest_osle() function.
 # This function does not produce any output. It returns a 'plot_expirest_osle'
 # object that is essentially an 'expirest_osle' object augmented by a 'ggplot'
 # object.
 gg1 <- plot_expirest_osle(
-  model = res1, show_grouping = "no", response_vbl_unit = "\%",
-  y_range = c(93, 107), x_range = NULL, plot_option = "full",
-  ci_app = "line")
-gg1
+  model = res1, response_vbl_unit = "\%", x_range = NULL, y_range = c(93, 105),
+  mtbs = "verified", plot_option = "full", ci_app = "line")
+\dontrun{
+  gg1
 
-# Since the element gg1$Graph is a 'ggplot' object it can be used for further
-# manipulation by aid of 'ggplot2' functions.
-if (requireNamespace("ggplot2")) {
-  library(ggplot2)
+  # Since the element gg1$Graph is a 'ggplot' object it can be used for further
+  # manipulation by aid of 'ggplot2' functions.
+  if (requireNamespace("ggplot2")) {
+    library(ggplot2)
 
-  gg1$Graph + labs(title = "Ordinary Shelf Life Estimation (OSLE)",
-                   x = "Time [months]", y = "Potency [\% LC]") +
-    scale_x_continuous(limits = c(-1, 31), breaks = seq(0, 30, 6))
+    gg1$Graph + labs(title = "Ordinary Shelf Life Estimation (OSLE)",
+                     x = "Time [months]", y = "Potency [\% LC]") +
+      scale_x_continuous(limits = c(-1, 31), breaks = seq(0, 30, 6))
+  }
 }
-
-# Illustration of the grouping
-gg2 <- plot_expirest_osle(
-  model = res1, show_grouping = "yes", response_vbl_unit = "\%",
-  y_range = c(93, 107), x_range = c(0, 35), plot_option = "full",
-  ci_app = "line")
-gg2
 
 # Repeat this for a different intercept / different slope (dids) model.
 res2 <-
   expirest_osle(data = exp1[exp1$Batch \%in\% c("b4", "b5", "b8"), ],
                 response_vbl = "Potency", time_vbl = "Month",
-                batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500))
+                batch_vbl = "Batch", sl = 95, sl_sf = 3,
+                srch_range = c(0, 500), sf_option = "loose")
+
+gg2 <- plot_expirest_osle(
+  model = res2, response_vbl_unit = "\%", x_range = c(0, 43),
+  y_range = c(83, 107), mtbs = "verified", plot_option = "full",
+  ci_app = "ribbon")
+\dontrun{
+  gg2
+}
+
+# In case of different intercept / different slope models, individually fit
+# linear models are shown by default, i.e. with the 'mtbs' parameter set
+# as "verified". To get the different intercept / different slope model
+# displayed where the mean square error is pooled across batches, i.e. the
+# dids.pmse model, the 'mtbs' parameter has to be set accordingly.
 
 gg3 <- plot_expirest_osle(
-  model = res2, show_grouping = "yes", response_vbl_unit = "\%",
-  y_range = c(83, 107), x_range = c(0, 43), plot_option = "full",
+  model = res2, response_vbl_unit = "\%", x_range = c(0, 43),
+  y_range = c(83, 107), mtbs = "dids.pmse", plot_option = "full",
   ci_app = "ribbon")
-gg3
+\dontrun{
+  gg3
+}
 }
 \seealso{
-\code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
+\code{\link{expirest_osle}}, \code{\link{expirest_wisle}},
+\code{\link{plot_expirest_wisle}}.
 }

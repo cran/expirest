@@ -8,12 +8,21 @@
 #' (because it estimates the shelf life (\dQuote{what}) for a given release
 #' limit (\dQuote{if})).
 #'
-#' @param rl A numeric value or a numeric vector specifying the release
+#' @param rl A numeric value or a numeric vector that specifies the release
 #'   specification limit(s) for which the corresponding expiry should be
 #'   estimated.
-#' @param rl_sf A positive integer or a vector of positive integers specifying
-#'   the number of \dQuote{significant figures} (sf) of \code{rl}. It must have
-#'   the same length as \code{rl}.
+#' @param rl_sf A positive integer or a vector of positive integers that
+#'   specifies the number of \dQuote{significant figures} (sf) of \code{rl}.
+#'   It must have the same length as \code{rl}.
+#' @param ivl_side A character string that specifies if the \dQuote{upper} or
+#'   the \dQuote{lower} limit is the relevant limit, i.e. either \code{"upper"}
+#'   or \code{"lower"}, respectively. The default is \code{"lower"}. Since this
+#'   parameter additionally specifies the relationship of \code{rl} with
+#'   \code{sl}, i.e. which of the two sides of \code{sl} the \code{rl} is
+#'   compared to, only either either \code{"upper"} or \code{"lower"} is
+#'   possible. In this respect, the usage of \code{ivl_side} differs from its
+#'   usage in the \code{expirest_osle()} function where \code{ivl_side} in
+#'   addition can be \code{"both"}.
 #' @inheritParams expirest_osle
 #'
 #' @details For the shelf life estimation for submissions in Australia the
@@ -79,61 +88,78 @@
 #' \item{Variables}{A list of the variable names, i.e. the original names of
 #'   \code{batch_vbl}, \code{time_vbl} and \code{response_vbl} and, if
 #'   applicable, of the transformed variables.}
-#' \item{Model.Type}{A list of five elements specifying which model, based on
-#'   the ANCOVA analysis, suits best. The first element (\code{type.spec})
-#'   is a numeric vector of length 2 specifying the best model accepted at the
-#'   significance level of 0.25. The first number represents the decision on
-#'   the intercept and the second on the slope, where \code{1} stands for
-#'   \dQuote{common} and \code{2} stands for \dQuote{different}.}
+#' \item{Model.Type}{A list of two elements that specifies which model, based
+#'   on the ANCOVA analysis, suits best. The first element (\code{type.spec})
+#'   is a numeric vector of length 2 that specifies the best model accepted at
+#'   the significance level specified by \code{alpha.pool}. The first number
+#'   represents the decision on the intercept and the second on the slope,
+#'   where \code{1} stands for \dQuote{common} and \code{2} stands for
+#'   \dQuote{different}. The second element (\code{type.acronym}) is an acronym
+#'   representing the first item.}
 #' \item{Models}{A list of four elements named \code{cics}, \code{dics},
-#'   \code{dids} and \code{individual}. The first three elements contain the
+#'   \code{dids.pmse} and \code{dids}. The first three elements contain the
 #'   \sQuote{\code{lm}} objects of the \dQuote{common intercept / common slope}
 #'   (\code{cics}), \dQuote{different intercept / common slope} (\code{dics})
 #'   and \dQuote{different intercept / different slope} (\code{dids}) models.
-#'   The fourth element is a list of the \sQuote{\code{lm}} objects of the
-#'   models obtained from fitting the data of each batch individually.}
+#'   The fourth element is a list of the \sQuote{\code{lm}} objects that is
+#'   obtained from fitting a regression model to the data of each level of the
+#'   categorical variable separately. The \code{cics}, \code{dics} and
+#'   \code{dids.pmse} elements are \code{NA} if data of only a single batch
+#'   is available.}
 #' \item{AIC}{A numeric named vector of the Akaike Information Criterion (AIC)
-#'   values of each of the three fitted models.}
+#'   values of the \code{cics}, \code{dics} and \code{dids.pmse} models.}
 #' \item{BIC}{A numeric named vector of the Bayesian Information Criterion (BIC)
-#'   values of each of the three fitted models.}
+#'   values of each of the \code{cics}, \code{dics} and \code{dids.pmse}
+#'   models.}
 #' \item{wc.icpt}{A data frame of the worst case intercepts of each of the
-#'   three fitted models.}
+#'   four fitted models.}
 #' \item{wc.batch}{A list of numeric value(s) of the worst case batch(es) per
-#'   model type. In case of the \code{dids} model type, the estimation is done
-#'   using the models obtained from fitting the data of each batch
-#'   individually.}
+#'   model type.}
 #' \item{Limits}{A list of all limits.}
 #' \item{POI}{A data frame of the intercepts, the differences between release
 #'   and shelf life limits, the WCSLs, the expiry and release specification
-#'   limits, the shelf lives and POI values. In case of the \code{dids} model
-#'   type, the estimation of the POI values is done using the models obtained
-#'   from fitting the data of each batch individually.}
+#'   limits, the shelf lives and POI values.}
 #'
-#' The \code{POI} data frame has the following columns:
-#' \item{Intercept.cics}{The intercept of the worst case batch for the cics
+#' Structure of the \code{POI} data frame:
+#' \item{Intercept.cics}{The intercept of the worst case batch of the cics
 #'   model.}
-#' \item{Intercept.dics}{The intercept of the worst case batch for the dics
+#' \item{Intercept.dics}{The intercept of the worst case batch of the dics
 #'   model.}
-#' \item{Intercept.dids}{The intercept of the worst case batch for the dids
-#'   model.}
+#' \item{Intercept.dids.pmse}{The intercept of the worst case batch of the dids
+#'   model with pooled mean square error (pmse).}
+#' \item{Intercept.dids}{The intercept of the worst case batch of the dids
+#'   model obtained by fitting individual models to the data of each batch.}
 #' \item{Delta.cics}{Absolute difference between the release and and the shelf
-#'   life specification for the cics model.}
+#'   life specification of the cics model.}
 #' \item{Delta.dics}{Absolute difference between the release and and the shelf
-#'   life specification for the dics model.}
+#'   life specification of the dics model.}
+#' \item{Delta.dids.pmse}{Absolute difference between the release and and the
+#'   shelf life specification of the dids model with pooled mean square error
+#'   (pmse).}
 #' \item{Delta.dids}{Absolute difference between the release and and the shelf
-#'   life specification for the dids model.}
-#' \item{WCSL.cics}{WCSL for the cics model.}
-#' \item{WCSL.dics}{WCSL for the dics model.}
-#' \item{WCSL.dids}{WCSL for the dids model.}
+#'   life specification of the dids model obtained by fitting individual
+#'   models to the data of each batch.}
+#' \item{WCSL.cics}{WCSL of the cics model.}
+#' \item{WCSL.dics}{WCSL of the dics model.}
+#' \item{WCSL.dids.pmse}{WCSL of the dids model with pooled mean square error
+#'   (pmse).}
+#' \item{WCSL.dids}{WCSL of the dids model obtained by fitting individual
+#'   models to the data of each batch.}
 #' \item{Exp.Spec}{The (expiry) specification, i.e. the specification which is
 #'   relevant for the determination of the expiry.}
 #' \item{Rel.Spec}{The calculated release specification.}
-#' \item{Shelf.Life.cics}{The estiamted shelf life for the cics model.}
-#' \item{Shelf.Life.dics}{The estiamted shelf life for the dics model.}
-#' \item{Shelf.Life.dids}{The estiamted shelf life for the dids model.}
-#' \item{POI.Model.cics}{The POI  of the cics model.}
+#' \item{Shelf.Life.cics}{The estimated shelf life of the cics model.}
+#' \item{Shelf.Life.dics}{The estimated shelf life of the dics model.}
+#' \item{Shelf.Life.dids.pmse}{The estimated shelf life of the dids model with
+#'   pooled mean square error (pmse).}
+#' \item{Shelf.Life.dids}{The estimated shelf life of the dids model obtained
+#'   by fitting individual models to the data of each batch.}
+#' \item{POI.Model.cics}{The POI of the cics model.}
 #' \item{POI.Model.dics}{The POI of the dics model.}
-#' \item{POI.Model.dids}{The POI of the dids model.}
+#' \item{POI.Model.dids.pmse}{The POI of the dids model with pooled mean
+#'   square error (pmse).}
+#' \item{POI.Model.dids}{The POI of the dids model obtained by fitting
+#'   individual models to the data of each batch.}
 #'
 #' @references
 #' Therapeutic Goods Administration (TGA) of the Department of Health of the
@@ -146,23 +172,21 @@
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 #' (CPMP/ICH/420/02).
 #'
-#' @seealso \code{\link{expirest_osle}}, \code{\link{find_poi}},
-#' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
-#' \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
+#' @seealso \code{\link{expirest_osle}}, \code{\link[stats]{uniroot}},
+#' \code{\link[stats]{lm}}, \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
 #'
 #' @example man/examples/examples_expirest_wisle.R
 #'
-#' @importFrom stats lm
-#' @importFrom stats as.formula
-#' @importFrom stats coef
+#' @importFrom stats setNames
 #'
 #' @export
 
 expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
-                       sl, sl_sf, srch_range, alpha = 0.05, alpha_pool = 0.25,
-                       xform = c("no", "no"), shift = c(0, 0),
-                       sf_option = "loose", ivl = "confidence",
-                       ivl_type = "one.sided", ivl_side = "lower", ...) {
+                           sl, sl_sf, srch_range, alpha = 0.05,
+                           alpha_pool = 0.25, xform = c("no", "no"),
+                           shift = c(0, 0), sf_option = "tight",
+                           ivl = "confidence", ivl_type = "one.sided",
+                           ivl_side = "lower", ...) {
   if (!is.data.frame(data)) {
     stop("The data must be provided as data frame.")
   }
@@ -191,16 +215,20 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
     stop("The parameter rl must be a numeric.")
   }
   if (!is.numeric(rl_sf) && all(!is.na(rl_sf))) {
-    stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
+    stop("The parameter rl_sf must be a positive integer of the same length ",
+         "as rl, or NA.")
   }
   if (sum(rl_sf < 0) > 0) {
-    stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
+    stop("The parameter rl_sf must be a positive integer of the same length ",
+         "as rl, or NA.")
   }
   if (length(rl_sf) != length(rl)) {
-    stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
+    stop("The parameter rl_sf must be a positive integer of the same length ",
+         "as rl, or NA.")
   }
   if (!isTRUE(all.equal(rl_sf, as.integer(rl_sf)))) {
-    stop("The parameter rl_sf must be a positive integer of length rl, or NA.")
+    stop("The parameter rl_sf must be a positive integer of the same length ",
+         "as rl, or NA.")
   }
   if (!is.numeric(sl) || length(sl) > 2) {
     stop("The parameter sl must be a numeric or vector of length 1 or 2.")
@@ -238,10 +266,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
       !(xform[2] %in% c("no", "log", "sqrt", "sq"))) {
     stop("Please specify xform appropriately.")
   }
-  if (length(shift) != 2) {
-    stop("The parameter shift must be a numeric vector of length 2.")
-  }
-  if (!is.numeric(shift)) {
+  if (!is.numeric(shift) || length(shift) != 2) {
     stop("The parameter shift must be a numeric vector of length 2.")
   }
   if (!(sf_option %in% c("tight", "loose"))) {
@@ -258,18 +283,26 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   }
 
   if (length(sl) == 1) {
-    if (ivl_side == "lower" && !all(rl > sl)) {
-      stop("If ivl_side is \"lower\" rl must be > sl.")
+    if (ivl_side == "lower" && any(signif(rl, sl_sf) < sl)) {
+      stop("If ivl_side is \"lower\" rl must be > sl. \nPlease change ",
+           paste0(rl[signif(rl, sl_sf) < sl], ", "),
+           "in the rl vector, accordingly.")
     }
-    if (ivl_side == "upper" && !all(rl < sl)) {
-      stop("If ivl_side is \"upper\" rl must be < sl.")
+    if (ivl_side == "upper" && any(signif(rl, sl_sf) > sl)) {
+      stop("If ivl_side is \"upper\" rl must be < sl. \nPlease change ",
+           paste0(rl[signif(rl, sl_sf) > sl], ", "),
+           "in the rl vector, accordingly.")
     }
   } else {
-    if (ivl_side == "lower" && !all(rl > sl[1])) {
-      stop("If ivl_side is \"lower\" rl must be > sl.")
+    if (ivl_side == "lower" && any(signif(rl, sl_sf[1]) < sl[1])) {
+      stop("If ivl_side is \"lower\" rl must be > sl. \nPlease change ",
+           paste0(rl[signif(rl, sl_sf[1]) < sl[1]], ", "),
+           "in the rl vector, accordingly.")
     }
-    if (ivl_side == "upper" && !all(rl < sl[2])) {
-      stop("If ivl_side is \"upper\" rl must be < sl.")
+    if (ivl_side == "upper" && any(signif(rl, sl_sf[2]) > sl[2])) {
+      stop("If ivl_side is \"upper\" rl must be < sl. \nPlease change ",
+           paste0(rl[signif(rl, sl_sf[2]) > sl[2]], ", "),
+           "in the rl vector, accordingly.")
     }
   }
 
@@ -282,7 +315,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
                          alpha = alpha, alpha_pool = alpha_pool, xform = xform,
                          shift = shift, sf_option = sf_option, ivl = ivl,
                          ivl_type = ivl_type, ivl_side = ivl_side,
-                         rl = rl, rl_sf = rl_sf)
+                         rl = rl, rl_sf = rl_sf, ...)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Linearisation of data by variable transformation
@@ -294,332 +327,39 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
   # Note: The log and sqrt transformations include adding the value defined by
   #       the shift parameter before performing the transformation.
 
-  if (sum(xform %in% "no") == 0) {
-    time_vbl <- r_ret[["Variables"]][["time"]]
-    response_vbl <- r_ret[["Variables"]][["response"]]
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      old_time_vbl <- r_ret[["Variables"]][["time.orig"]]
-      time_vbl <- r_ret[["Variables"]][["time"]]
-    }
-    if (xform[2] != "no") {
-      old_response_vbl <- r_ret[["Variables"]][["response.orig"]]
-      response_vbl <- r_ret[["Variables"]][["response"]]
-    }
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Fit of all possible models that are relevant and their intercepts
-
-  l_models <- r_ret[["Models"]]
-  l_icpt <- r_ret[["Intercepts"]]
+  d_dat <- r_ret[["Data"]]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Determination of limits
 
-  l_lim <- r_ret$Limits
+  rel_lim <- get_relevant_limits(limits_list = r_ret[["Limits"]],
+                                 xform = xform, ivl_side = ivl_side)
 
-  # For the assessments to follow only the relevant limits are used.
-  # ---------
-  # Specification limits
-  if (length(sl) == 2) {
-    switch(ivl_side,
-           "lower" = {
-             sl_orig <- l_lim[["sl.orig"]][1]
-
-             if (xform[2] == "no") {
-               sl <- l_lim[["sl"]][1]
-             } else {
-               sl <- l_lim[["sl.trfmd"]][1]
-               sl_bt <- l_lim[["sl"]][1]
-             }
-           },
-           "upper" = {
-             sl_orig <- l_lim[["sl.orig"]][2]
-
-             if (xform[2] == "no") {
-               sl <- l_lim[["sl"]][2]
-             } else {
-               sl <- l_lim[["sl.trfmd"]][2]
-               sl_bt <- l_lim[["sl"]][2]
-             }
-           })
-  } else {
-    sl_orig <- l_lim[["sl.orig"]]
-
-    if (xform[2] == "no") {
-      sl <- l_lim[["sl"]]
-    } else {
-      sl <- l_lim[["sl.trfmd"]]
-      sl_bt <- l_lim[["sl"]]
-    }
-  }
-
-  # ---------
-  # Release limits
-  rl_orig <- l_lim[["rl.orig"]]
-
-  if (xform[2] == "no") {
-    rl <- l_lim[["rl"]]
-  } else {
-    rl <- l_lim[["rl.trfmd"]]
-    rl_bt <- l_lim[["rl"]]
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Calculation of POI values for all models (according to ARGPM)
 
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of worst case scenario (wcs) limits for all intercepts of
-  # all models (on the transformed scale, if data have been transformed)
+  l_wisle <- get_wisle_poi_list(icpt_list = r_ret[["Intercepts"]],
+                                model_list = r_ret[["Models"]],
+                                rl = rel_lim[["rl"]], sl = rel_lim[["sl"]],
+                                srch_range = srch_range, alpha = alpha,
+                                xform = xform, shift = shift, ivl = ivl,
+                                ivl_type = ivl_type, ivl_side = ivl_side, ...)
 
-  # List of all wcs_limit lists
-  ll_wcsl <- lapply(seq_along(l_icpt), function(i) {
-    lapply(l_icpt[[i]]$icpt, function(xx) {
-      lapply(rl, function(j) {
-        get_wcs_limit(rl = j, sl = sl, intercept = xx,
-                      xform = xform, shift = shift,
-                      ivl_side = ivl_side)
-      })
-    })
-  })
-  names(ll_wcsl) <- names(l_icpt)
-
-  l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Calculation of POI values for all wcs limits
-  # Determination of worst case POI values
+  # Compilation of summary data frame
 
-  # The worst case POI value is the POI value obtained with the batch whose
-  # lower or upper confidence or prediction interval limit is closest to the
-  # corresponding specification limit, i.e. the worst case batch.
+  l_ws <- compile_wisle_summary(data = d_dat,
+                                batch_vbl = batch_vbl,
+                                rl = rel_lim[["rl"]],
+                                poi_list = l_wisle[["all.poi"]],
+                                icpt_list = r_ret[["Intercepts"]],
+                                wcsl_list = l_wisle[["all.wcsl"]],
+                                wcb_list = l_wisle[["which.wc.batch"]],
+                                limits_list = rel_lim,
+                                poi_ich = r_ret[["POI"]],
+                                xform = xform, shift = shift)
 
-  # Example: the response is the assay, and the lower specification limit is
-  # the relevant limit. A batch may have a shorter POI than the other batches,
-  # but because it has a higher intercept or/and smaller variability than one
-  # or more of the other batches, the lower confidence or prediction interval
-  # limit of one of the other batches still may be closer to the lower
-  # specification limit so that their POI values are the POI values of
-  # relevance.
-
-  # Note: in case of the "dids" model the POI is not determined using the model
-  # that was determined using the data from all batches (i.e. the full model
-  # with the batch_vbl * time_vbl interaction term). Instead, separate models
-  # are fitted to the data of each individual batch and the POI values are
-  # determined for each of these models. Of these POI values, the smallest is
-  # returned.
-
-  l_poi <- vector(mode = "list", length = length(l_icpt))
-  names(l_poi) <- c("cics", "dics", "dids")
-
-  l_prl <- vector(mode = "list", length = length(l_icpt))
-  names(l_prl) <- c("cics", "dics", "dids")
-
-  for (variety in names(l_icpt)) {
-    # Initialise empty arrays
-    m_poi <-
-      matrix(NA, nrow = length(rl), ncol = length(l_icpt[[variety]][["icpt"]]))
-    colnames(m_poi) <- names(l_icpt[[variety]][["icpt"]])
-
-    a_prl <- array(NA, dim = c(length(rl), length(l_icpt[[variety]][["icpt"]]),
-                               length(l_icpt[[variety]][["icpt"]])),
-                   dimnames = list(as.character(seq_along(rl)),
-                                   names(l_icpt[[variety]][["icpt"]]),
-                                   names(l_icpt[[variety]][["icpt"]])))
-
-    # Fill arrays
-    for (j in seq_along(rl)) {
-      for (k in seq_len(ncol(l_wcsl[[variety]]))) {
-        if (variety != "dids") {
-          tmp_poi <- try_get_model(
-            find_poi(srch_range = srch_range,
-                     model = l_models[[variety]],
-                     sl = l_wcsl[[variety]][j, k], alpha = alpha,
-                     ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
-        } else {
-          tmp_poi <- try_get_model(
-            find_poi(srch_range = srch_range,
-                     model = l_models[["individual"]][[k]],
-                     sl = l_wcsl[[variety]][j, k], alpha = alpha,
-                     ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl))
-        }
-
-        if (is.null(tmp_poi[["Error"]])) {
-          m_poi[j, k] <- tmp_poi[["Model"]]
-
-          if (variety != "dids") {
-            tmp_prl <- try_get_model(
-              get_intvl_limit(
-                x_new = tmp_poi[["Model"]],
-                model = l_models[[variety]], alpha = alpha,
-                ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-            )
-
-            if (is.null(tmp_prl[["Error"]])) {
-              a_prl[j, k, ] <- tmp_prl[["Model"]]
-            }
-          } else {
-            t_prl <- rep(NA, ncol(l_wcsl[[variety]]))
-
-            for (kk in seq_len(ncol(l_wcsl[["dids"]]))) {
-              tmp_prl <- try_get_model(
-                get_intvl_limit(
-                  x_new = tmp_poi[["Model"]],
-                  model = l_models[["individual"]][[kk]], alpha = alpha,
-                  ivl_type = ivl_type, ivl_side = ivl_side, ivl = ivl)
-              )
-
-              if (is.null(tmp_prl[["Error"]])) {
-                t_prl[kk] <- tmp_prl[["Model"]]
-              }
-            }
-
-            a_prl[j, k, ] <- t_prl
-          }
-        }
-      }
-    }
-
-    # Put the resulting arrays into the corresponding list entries
-    l_poi[[variety]] <- m_poi
-    l_prl[[variety]] <- a_prl
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Determination of the batches with the confidence or prediction interval
-  # limits that are closest to the respective specification limit for each
-  # model and each POI
-
-  switch(ivl_side,
-         "lower" = {
-           l_min_dist <- lapply(l_prl, FUN = function(x) {
-             apply(x, c(1, 2), FUN = function(y) {
-               ifelse(length(which.min(y)) != 0, which.min(abs(y)), NA)
-             })
-           })
-         },
-         "upper" = {
-           l_min_dist <- lapply(l_prl, FUN = function(x) {
-             apply(x, c(1, 2), FUN = function(y) {
-               ifelse(length(which.max(y)) != 0, which.max(abs(y)), NA)
-             })
-           })
-         })
-
-  # Determination of the smallest POI value for each model and each rl value
-  l_min_poi <- lapply(l_poi, FUN = function(x) {
-    apply(x, 1, function(y) {
-      ifelse(length(which.min(y)) != 0, which.min(y), NA)
-    })
-  })
-
-  # Determination of the worst case batches for each model and each rl value:
-  #   The worst case batches are the ones with the confidence or prediction
-  #   interval limits that are closest to the respective specification limit
-  #   where the POI values are smallest.
-  # In case of cics model: wc_icpt_ich is the common intercept of all batches
-  #   and none of the batches is the worst case batch.
-
-  l_wc_batch <- vector(mode = "list", length = length(l_min_poi))
-  names(l_wc_batch) <- names(l_min_poi)
-
-  for (i in seq_along(l_min_dist)) {
-    if (names(l_min_dist)[i] == "cics") {
-      l_wc_batch[[i]] <- rep(NA, length(rl))
-    } else {
-      l_wc_batch[[i]] <-
-        vapply(seq_along(rl), function(j) {
-          ifelse(!is.na(l_min_poi[[i]][j]),
-                 l_min_dist[[i]][j, l_min_poi[[i]][j]],
-                 NA)
-        },
-        numeric(1))
-    }
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Matrix of the worst case POI values for each model and each rl value
-
-  m_poi <- extract_wc_x(l1 = l_poi, l2 = l_wc_batch)
-
-  # Depending on the transformation of the time variable the POI values have to
-  # be back-transformed.
-
-  if (xform[1] != "no") {
-    switch(xform[1],
-           "log" = {
-             m_poi <- exp(m_poi) - shift[1]
-           },
-           "sqrt" = {
-             m_poi <- m_poi^2 - shift[1]
-           },
-           "sq" = {
-             m_poi <- sqrt(m_poi) - shift[1]
-           })
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Collection of data and compilation of summary data frame
-
-  # ---------
-  # Worst case intercepts (wc_icpt_argpm) (on the original scale)
-
-  if (xform[2] == "no") {
-    wc_icpt_argpm <- extract_wc_x(l1 = l_icpt, l2 = l_wc_batch)
-  } else {
-    l_icpt_sub <- lapply(l_icpt, function(x) list(x$icpt.orig))
-    wc_icpt_argpm <- extract_wc_x(l1 = l_icpt_sub, l2 = l_wc_batch)
-  }
-
-  # ---------
-  # Delta and WCSL
-
-  if (xform[2] == "no") {
-    l_delta <- extract_from_ll_wcsl(ll_wcsl, "delta.lim")
-    l_wcsl <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim")
-
-    m_delta <- extract_wc_x(l1 = l_delta, l2 = l_wc_batch)
-    m_wcsl <- extract_wc_x(l1 = l_wcsl, l2 = l_wc_batch)
-  } else {
-    l_delta_orig <- extract_from_ll_wcsl(ll_wcsl, "delta.lim.orig")
-    l_wcsl_orig <- extract_from_ll_wcsl(ll_wcsl, "wcs.lim.orig")
-
-    m_delta <- extract_wc_x(l1 = l_delta_orig, l2 = l_wc_batch)
-    m_wcsl <- extract_wc_x(l1 = l_wcsl_orig, l2 = l_wc_batch)
-  }
-
-  # ---------
-  # Summary data frame compilation
-
-  d_poi <- data.frame(
-    Intercept.cics = wc_icpt_argpm[, "cics"],
-    Intercept.dics = wc_icpt_argpm[, "dics"],
-    Intercept.dids = wc_icpt_argpm[, "dids"],
-    Delta.cics = m_delta[, "cics"],
-    Delta.dics = m_delta[, "dics"],
-    Delta.dids = m_delta[, "dids"],
-    WCSL.cics = m_wcsl[, "cics"],
-    WCSL.dics = m_wcsl[, "dics"],
-    WCSL.dids = m_wcsl[, "dids"],
-    Exp.Spec.Report = rep(sl_orig, nrow(m_poi)),
-    Exp.Spec = rep(sl, nrow(m_poi)),
-    Rel.Spec.Report = rl_orig,
-    Rel.Spec = rl,
-    Shelf.Life.cics = m_poi[, "cics"],
-    Shelf.Life.dics = m_poi[, "dics"],
-    Shelf.Life.dids = m_poi[, "dids"],
-    POI.Model.cics = rep(r_ret[["POI"]]["cics"], nrow(m_poi)),
-    POI.Model.dics = rep(r_ret[["POI"]]["dics"], nrow(m_poi)),
-    POI.Model.dids = rep(r_ret[["POI"]]["dids"], nrow(m_poi)))
-
-  if (xform[2] != "no") {
-    d_poi[, "Exp.Spec"] <- rep(sl_bt, nrow(m_poi))
-    d_poi[, "Rel.Spec"] <- rl_bt
-  }
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Putting results into a list
@@ -631,10 +371,10 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
                  Models = r_ret[["Models"]],
                  AIC = r_ret[["AIC"]],
                  BIC = r_ret[["BIC"]],
-                 wc.icpt = wc_icpt_argpm,
-                 wc.batch = l_wc_batch,
-                 Limits = l_lim,
-                 POI = d_poi),
+                 wc.icpt = l_ws[["wc.icpt"]],
+                 wc.batch = l_wisle[["which.wc.batch"]],
+                 Limits = r_ret[["Limits"]],
+                 POI = l_ws[["POI"]]),
             class = "expirest_wisle")
 }
 
@@ -645,20 +385,20 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #'
 #' @param model An \sQuote{\code{expirest_wisle}} object, i.e. a list returned
 #'   by the \code{\link{expirest_wisle}()} function.
-#' @param rl_index A positive integer specifying which of the release limit
+#' @param rl_index A positive integer that specifies which of the release limit
 #'   values that have been handed over to \code{\link{expirest_wisle}()} should
 #'   be displayed. The default value is \code{1}.
-#' @param scenario A character string specifying if the plot should be extended
-#'   (with respect to the \eqn{x} axis) up to the \dQuote{standard scenario}
-#'   (\code{"standard"}) or up to the \dQuote{worst case scenario}
+#' @param scenario A character string that specifies if the plot should be
+#'   extended (with respect to the \eqn{x} axis) up to the \dQuote{standard
+#'   scenario} (\code{"standard"}) or up to the \dQuote{worst case scenario}
 #'   (\code{"worst"}). The default is \code{"standard"}.
 #' @param plot_option A character string of either \code{"full"},
-#'   \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"},
-#'   specifying if all the information should be shown in the plot (option
-#'   \code{"full"}) or only basic information (options \code{"lean"} and
-#'   \code{"basic"}). Full means the data points, the fitted regression line
-#'   with the confidence or prediction interval, the specification limit(s)
-#'   and the estimated shelf life. The default is \code{"full"}.
+#'   \code{"lean1"}, \code{"lean2"}, \code{"basic1"} and \code{"basic2"}
+#'   that specifies if additional information should be shown in the plot
+#'   (option \code{"full"}) or only basic information (options \code{"lean"}
+#'   and \code{"basic"}). Full means the data points, the fitted regression
+#'   line with the confidence or prediction interval, the specification
+#'   limit(s) and the estimated shelf life. The default is \code{"full"}.
 #' @inheritParams plot_expirest_osle
 #'
 #' @details The function \code{plot_expirest_wisle()} uses the data and the
@@ -689,14 +429,11 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #' \item{segments}{A data frame of segment line elements on the plot.}
 #' \item{arrow}{A data frame of arrow elements on the plot.}
 #'
-#' @seealso \code{\link{expirest_wisle}}, \code{\link{expirest_osle}}.
+#' @seealso \code{\link{expirest_wisle}}, \code{\link{expirest_osle}},
+#' \code{\link{plot_expirest_osle}}.
 #'
 #' @example man/examples/examples_plot_expirest_wisle.R
 #'
-#' @importFrom stats lm
-#' @importFrom stats as.formula
-#' @importFrom stats coef
-#' @importFrom stats predict
 #' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 aes
@@ -710,6 +447,7 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #' @importFrom ggplot2 arrow
 #' @importFrom ggplot2 scale_x_continuous
 #' @importFrom ggplot2 scale_y_continuous
+#' @importFrom ggplot2 coord_cartesian
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 theme_bw
 #' @importFrom ggplot2 guide_legend
@@ -718,13 +456,16 @@ expirest_wisle <- function(data, response_vbl, time_vbl, batch_vbl, rl, rl_sf,
 #' @importFrom ggplot2 element_rect
 #' @importFrom ggplot2 element_line
 #' @importFrom ggplot2 unit
+#' @importFrom lifecycle badge
+#' @importFrom lifecycle deprecate_warn
 #'
 #' @export
 
-plot_expirest_wisle <- function(
-  model, rl_index = 1, show_grouping = "yes", response_vbl_unit = NULL,
-  y_range, x_range = NULL, scenario = "standard", plot_option = "full",
-  ci_app = "line") {
+plot_expirest_wisle <- function(model, rl_index = 1, show_grouping = "yes",
+                                response_vbl_unit = NULL, x_range = NULL,
+                                y_range = NULL, scenario = "standard",
+                                mtbs = "verified", plot_option = "full",
+                                ci_app = "line") {
   if (!inherits(model, "expirest_wisle")) {
     stop("The model must be an object of class expirest_wisle.")
   }
@@ -738,25 +479,33 @@ plot_expirest_wisle <- function(
     stop("The parameter rl_index must be between 1 and the number of rl ",
          "values.")
   }
-  if (!(show_grouping %in% c("yes", "no"))) {
-    stop("Please specify show_grouping either as \"yes\" or \"no\".")
-  }
-  if (!is.numeric(y_range) || length(y_range) != 2) {
-    stop("The parameter y_range must be a vector of length 2.")
-  }
-  if (y_range[1] > y_range[2]) {
-    stop("The parameter y_range must be of the form c(min, max).")
+  if (show_grouping == "no") {
+    lifecycle::deprecate_warn(
+      when = "0.1.7",
+      what = "plot_expirest_wisle(show_grouping)",
+      with = "plot_expirest_wisle(mtbs)",
+      details =
+        c("If you do not want to see the grouping, use mtbs = \"cics\". ",
+          "If you have set show_grouping = \"no\", mtbs is set to \"cics\".",
+          "If you have set show_grouping = \"yes\", the settings in mtbs
+          apply."))
   }
   if (!is.null(x_range)) {
     if (!is.numeric(x_range) || length(x_range) != 2) {
       stop("The parameter x_range must be a vector of length 2.")
     }
-    if (x_range[1] > x_range[2]) {
-      stop("The parameter x_range must be of the form c(min, max).")
+  }
+  if (!is.null(y_range)) {
+    if (!is.numeric(y_range) || length(y_range) != 2) {
+      stop("The parameter y_range must be a vector of length 2.")
     }
   }
   if (!(scenario %in% c("standard", "worst"))) {
     stop("Please specify scenario either as \"standard\" or \"worst\".")
+  }
+  if (!(mtbs %in% c("verified", "cics", "dics", "dids", "dids.pmse"))) {
+    stop("Please specify mtbs either as \"verified\", \"cics\", \"dics\", ",
+         "\"dids\" or \"dids.pmse\".")
   }
   if (!(plot_option %in% c("full", "lean1", "lean2", "basic1", "basic2"))) {
     stop("Please specify plot_option either as \"full\", \"lean1\", ",
@@ -778,242 +527,105 @@ plot_expirest_wisle <- function(
 
   expob <- model
 
+  d_dat <- expob[["Data"]]
+  xform <- expob[["Limits"]][["xform"]]
+
   # Make visible binding for global variable
   LL <- UL <- NULL
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Extraction of models and of the model type
-  # If show_grouping = "no" the model_type is "cics"
-
-  l_models <- expob[["Models"]]
+  # If show_grouping = "no", the model_type is "cics"
 
   if (show_grouping == "yes") {
-    model_name <- expob[["Model.Type"]][["type.acronym"]]
+    model_name <- ifelse(mtbs == "verified",
+                         expob[["Model.Type"]][["type.acronym"]],
+                         mtbs)
   } else {
     model_name <- "cics"
+    mtbs <- "cics"
   }
 
-  # Most appropriate model based on the ANCOVA analysis (show_grouping = "yes")
-  # or marginal model (show_grouping = "no")
-  model <- l_models[[model_name]]
-  poi_model_name <- paste("POI.Model", model_name, sep = ".")
-  sl_model_name <- paste("Shelf.Life", model_name, sep = ".")
-  wcsl_model_name <- paste("WCSL", model_name, sep = ".")
+  # Set model_name to dids if it is n.a.
+  model_name <- ifelse(model_name == "n.a.", "dids", model_name)
 
-  # <-><-><->
+  # Most appropriate model based on the ANCOVA analysis, or as specified
+  # via the mtbs parameter
+  poi_model_name <- paste0("POI.Model.", model_name)
+  sl_model_name <- paste0("Shelf.Life.", model_name)
+
   # Checking if estimation of POI.Model or Shelf.Life was successful (for the
   # release limit value that was deemed relevant, i.e. the one specified by
   # the rl_index parameter)
-
   t_exp <- expob[["POI"]]
 
   if (sum(is.na(
     t_exp[rl_index,
-          c(grep(paste("Shelf.Life", model_name, sep = "."), names(t_exp)),
-            grep(paste("POI.Model", model_name, sep = "."), names(t_exp)))]))
+          c(grep(paste0("^Shelf.Life.", model_name, "$"), names(t_exp)),
+            grep(paste0("^POI.Model.", model_name, "$"), names(t_exp)))]))
     > 0) {
     stop("Expiry determination was not successful.")
   }
 
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Extraction of data and parameters
-
-  d_dat <- expob[["Data"]]
-
-  alpha <- expob[["Parameters"]][["alpha"]]
-  ivl <- expob[["Parameters"]][["ivl"]]
-  ivl_type <- expob[["Parameters"]][["ivl.type"]]
-  ivl_side <- expob[["Parameters"]][["ivl.side"]]
-
-  if (expob[["Limits"]][["sf.option"]] == "tight") {
-    rl_sf <- expob[["Limits"]][["rl.sf"]]
-    sl_sf <- expob[["Limits"]][["sl.sf"]]
-  } else {
-    rl_sf <- expob[["Limits"]][["rl.sf"]] + 1
-    sl_sf <- expob[["Limits"]][["sl.sf"]] + 1
-  }
-
-  xform <- expob[["Limits"]][["xform"]]
-  shift <- expob[["Limits"]][["shift"]]
-  wc_icpt <- expob[["wc.icpt"]][, model_name]
-
-  if (sum(xform %in% "no") == 2) {
-    response_vbl <- expob[["Variables"]][["response"]]
-    time_vbl <- expob[["Variables"]][["time"]]
-    batch_vbl <- expob[["Variables"]][["batch"]]
-  }
-  if (sum(xform %in% "no") == 0) {
-    old_response_vbl <- expob[["Variables"]][["response.orig"]]
-    response_vbl <- expob[["Variables"]][["response"]]
-    old_time_vbl <- expob[["Variables"]][["time.orig"]]
-    time_vbl <- expob[["Variables"]][["time"]]
-    batch_vbl <- expob[["Variables"]][["batch"]]
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      response_vbl <- expob[["Variables"]][["response"]]
-      old_time_vbl <- expob[["Variables"]][["time.orig"]]
-      time_vbl <- expob[["Variables"]][["time"]]
-      batch_vbl <- expob[["Variables"]][["batch"]]
-    }
-    if (xform[2] != "no") {
-      old_response_vbl <- expob[["Variables"]][["response.orig"]]
-      response_vbl <- expob[["Variables"]][["response"]]
-      time_vbl <- expob[["Variables"]][["time"]]
-      batch_vbl <- expob[["Variables"]][["batch"]]
-    }
-  }
-
-  # Note: since the predict.lm() function from the 'stats' package always
-  # calculates two-sided limits the value of alpha must be doubled in case
-  # that the ivl_type is "one-sided".
-  if (ivl_type == "one.sided") {
-    alpha <- alpha * 2
-  }
-
-  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Extraction of limits and the intercept
-
-  l_lim <- expob[["Limits"]]
-
-  sl <- l_lim[["sl"]]
-  rl <- l_lim[["rl"]]
-
   # POI with the upper or lower confidence or prediction interval of the
-  # linear regression model and worst case scenario (woca) case
-  # Most appropriate model
+  # linear regression model representing the worst case scenario (woca) case
   poi_model <- t_exp[rl_index, poi_model_name]
   poi_woca <- t_exp[rl_index, sl_model_name]
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # Setting ranges and ticks
-
-  # Find a sequence for a graph with 10 ticks displaying numbers divisible by
-  # 3 and which contains 10 numbers between each tick, i.e. a sequence with a
-  # maximal length of 100. The value of scenario ("standard" or "worst") must
-  # be taken into account.
-  # For the setting of the optimal x range t_min and t_max are determined.
+  # Setting x_range and ticks
 
   if (!is.null(x_range)) {
-    t_min <- x_range[1]
+    x_min <- min(x_range)
   } else {
     if (xform[1] == "no") {
-      t_min <- pretty(d_dat[, time_vbl], n = 1)[1]
+      x_min <- pretty(d_dat[, expob[["Variables"]][["time"]]], n = 1)[1]
     } else {
-      t_min <- pretty(d_dat[, old_time_vbl], n = 1)[1]
+      x_min <- pretty(d_dat[, expob[["Variables"]][["time.orig"]]], n = 1)[1]
     }
   }
 
   if (!is.null(x_range)) {
-    t_max <- x_range[2]
+    x_max <- max(x_range)
   } else {
     switch(scenario,
            "standard" = {
-             t_max <- pretty(poi_model, n = 1)[2]
+             x_max <- pretty(poi_model, n = 1)[2]
            },
            "worst" = {
-             t_max <- pretty(poi_woca, n = 1)[2]
+             x_max <- pretty(poi_woca, n = 1)[2]
            })
   }
 
-  # Setting x_range and the x_breaks where the number of ticks should be 5
-  x_range <- c(t_min, t_max)
-  x_breaks <- pretty(x_range, 5)
-
-  if (plot_option == "full") {
-    x_range[1] <- x_breaks[1] - x_breaks[2]
-  }
-
-  # Setting the y_breaks where the number of ticks should be 5.
-  y_breaks <- pretty(y_range, 5)
+  x_range <- c(x_min, x_max)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Prediction based on linear model
 
-  # Generate the new x values (on the original scale) for prediction
-  x_new <- seq(t_min, t_max, length.out = 100)
+  d_pred <- get_predictions(model = expob, model_name = model_name,
+                            x_range = x_range)
 
-  # Transformation of new x values, if necessary
-  switch(xform[1],
-         "no" = {
-         },
-         "log" = {
-           x_new_trfmd <- log(x_new + shift[1])
-         },
-         "sqrt" = {
-           x_new_trfmd <- sqrt(x_new + shift[1])
-         },
-         "sq" = {
-           x_new_trfmd <- (x_new + shift[1])^2
-         })
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # Setting y_range and ticks
 
-  # Creation of data frame for the predict.lm() function
-  t_batches <- levels(d_dat[, batch_vbl])
-
-  if (xform[1] == "no") {
-    d_new <- data.frame(rep(t_batches, each = length(x_new)),
-                        rep(x_new, times = length(t_batches)))
+  if (!is.null(y_range)) {
+    y_min <- min(y_range)
+    y_max <- max(y_range)
   } else {
-    d_new <- data.frame(rep(t_batches, each = length(x_new_trfmd)),
-                        rep(x_new_trfmd, times = length(t_batches)))
+    tmp <- pretty(c(d_pred$LL, d_pred$UL), n = 1)
+    y_min <- tmp[1]
+    y_max <- tmp[length(tmp)]
   }
 
-  colnames(d_new) <- c(batch_vbl, time_vbl)
-
-  # Prediction
-  if (model_name != "dids") {
-    m_pred <- predict(model, newdata = d_new, interval = ivl,
-                      level = 1 - alpha)
-  } else {
-    l_pred <- lapply(t_batches, function(x) {
-      predict(l_models$individual[[x]],
-              newdata = d_new[d_new[, batch_vbl] == x, ],
-              interval = ivl, level = 1 - alpha)
-    })
-    m_pred <- do.call(rbind, l_pred)
-  }
-
-  # Back-transformation of predicted (response) values, if necessary
-  switch(xform[2],
-         "no" = {
-         },
-         "log" = {
-           m_pred <- exp(m_pred) - shift[2]
-         },
-         "sqrt" = {
-           m_pred <- m_pred^2 - shift[2]
-         },
-         "sq" = {
-           m_pred[m_pred < 0] <- NA
-           m_pred <- sqrt(m_pred) - shift[2]
-         })
-
-  # Generation of data frame for plotting (with x values in original scale)
-  if (sum(xform %in% "no") == 2) {
-    d_pred <- as.data.frame(cbind(d_new, m_pred))
-    colnames(d_pred) <- c(batch_vbl, time_vbl, response_vbl, "LL", "UL")
-  }
-  if (sum(xform %in% "no") == 0) {
-    d_pred <- data.frame(rep(t_batches, each = length(x_new)),
-                         rep(x_new, times = length(t_batches)),
-                         m_pred)
-    colnames(d_pred) <- c(batch_vbl, old_time_vbl, old_response_vbl, "LL", "UL")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      d_pred <- data.frame(rep(t_batches, each = length(x_new)),
-                           rep(x_new, times = length(t_batches)),
-                           m_pred)
-      colnames(d_pred) <- c(batch_vbl, old_time_vbl, response_vbl, "LL", "UL")
-    }
-    if (xform[2] != "no") {
-      d_pred <- as.data.frame(cbind(d_new, m_pred))
-      colnames(d_pred) <- c(batch_vbl, time_vbl, old_response_vbl, "LL", "UL")
-    }
-  }
+  y_range <- c(y_min, y_max)
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Generation of ancillary data frames for plotting
+
+  # Modification of the x range if necessary
+  if (plot_option == "full") {
+    x_range[1] <- x_range[1] - x_range[2] / 5
+  }
 
   # <-><-><->
   # d_text - display of text elements
@@ -1024,218 +636,19 @@ plot_expirest_wisle <- function(
   # POI worst case (low at poi.woca), POI model (low at poi.model)
   # RL (lower right or upper right)
 
-  if (length(sl) == 2) {
-    d_text <- data.frame(
-      Time = c(rep(x_range[2], 2), 0, 0, poi_woca, poi_model),
-      Response = c(sl, t_exp[rl_index, wcsl_model_name], wc_icpt[rl_index],
-                   rep(sl[1], 2)),
-      Label = c(print_val("LSL: ", sl[1], rvu, sl_sf[1]),
-                print_val("USL: ", sl[2], rvu, sl_sf[2]),
-                print_val("", t_exp[rl_index, wcsl_model_name], rvu,
-                          rl_sf[rl_index], suffix = " "),
-                print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index]),
-                ifelse(plot_option %in% "lean2",
-                       print_val("", poi_woca, "",
-                                 get_n_whole_part(poi_woca) + 1),
-                       print_val("", poi_woca, "",
-                                 get_n_whole_part(poi_woca) + 1,
-                                 suffix = "\n(worst case scenario)")),
-                ifelse(plot_option %in% "lean2",
-                       print_val("", poi_model, "",
-                                 get_n_whole_part(poi_model) + 1),
-                       print_val("", poi_model, "",
-                                 get_n_whole_part(poi_model) + 1,
-                                 suffix = "\n(standard scenario)"))),
-      Colour = c("black", "black", "red", "royalblue", "forestgreen", "grey50"),
-      stringsAsFactors = FALSE)
-
-    switch(ivl_side,
-           "lower" = {
-             d_text <- rbind(d_text, d_text[nrow(d_text), ])
-             d_text[nrow(d_text), "Time"] <- x_range[2]
-             d_text[nrow(d_text), "Response"] <- t_exp[rl_index, "Rel.Spec"]
-             d_text[nrow(d_text), "Label"] <-
-               print_val("LRL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                         rl_sf[rl_index])
-             d_text[nrow(d_text), "Colour"] <- "grey0"
-
-             d_text$Response <- d_text$Response +
-               c(rep(diff(y_breaks[1:2]), 2), 0, 0,
-                 rep(diff(y_breaks[1:2]), 2),
-                 diff(y_breaks[1:2])) * 1 / c(-10, 10, 1, 1, -2, -2, -10)
-           },
-           "upper" = {
-             d_text <- rbind(d_text, d_text[nrow(d_text), ])
-             d_text[nrow(d_text), "Time"] <- x_range[2]
-             d_text[nrow(d_text), "Response"] <- t_exp[rl_index, "Rel.Spec"]
-             d_text[nrow(d_text), "Label"] <-
-               print_val("URL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                         rl_sf[rl_index])
-             d_text[nrow(d_text), "Colour"] <- "grey0"
-             d_text[5:6, "Response"] <- rep(sl[2], 2)
-
-             d_text$Response <- d_text$Response +
-               c(rep(diff(y_breaks[1:2]), 2), 0, 0,
-                 rep(diff(y_breaks[1:2]), 2),
-                 diff(y_breaks[1:2])) * 1 / c(10, 10, 1, 1, 2, 2, 1)
-           })
-  } else {
-    switch(ivl_side,
-           "lower" = {
-             d_text <- data.frame(
-               Time = c(x_range[2], 0, 0, poi_woca, poi_model, x_range[2]),
-               Response = c(sl, t_exp[rl_index, wcsl_model_name],
-                            wc_icpt[rl_index], rep(sl, 2),
-                            t_exp[rl_index, "Rel.Spec"]),
-               Label =
-                 c(print_val("LSL: ", sl, rvu, sl_sf),
-                   print_val("", t_exp[rl_index, wcsl_model_name], rvu,
-                             rl_sf[rl_index], suffix = " "),
-                   print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index],
-                             suffix = " "),
-                   ifelse(plot_option %in% "lean2",
-                          print_val("", poi_woca, "",
-                                    get_n_whole_part(poi_woca) + 1),
-                          print_val("", poi_woca, "",
-                                    get_n_whole_part(poi_woca) + 1,
-                                    suffix = "\n(worst case scenario)")),
-                   ifelse(plot_option %in% "lean2",
-                          print_val("", poi_model, "",
-                                    get_n_whole_part(poi_model) + 1),
-                          print_val("", poi_model, "",
-                                    get_n_whole_part(poi_model) + 1,
-                                    suffix = "\n(standard scenario)")),
-                   print_val("LRL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                             rl_sf[rl_index])),
-               Colour = c("black", "red", "royalblue", "forestgreen", "grey50",
-                          "grey0"),
-               stringsAsFactors = FALSE)
-             d_text$Response <- d_text$Response +
-               c(diff(y_breaks[1:2]), 0, 0,
-                 rep(diff(y_breaks[1:2]), 2),
-                 diff(y_breaks[1:2])) * 1 / c(-10, 1, 1, -2, -2, -10)
-           },
-           "upper" = {
-             d_text <- data.frame(
-               Time = c(x_range[2], 0, 0, poi_woca, poi_model, x_range[2]),
-               Response = c(sl, t_exp[rl_index, wcsl_model_name],
-                            wc_icpt[rl_index], rep(sl, 2),
-                            t_exp[rl_index, "Rel.Spec"]),
-               Label =
-                 c(print_val("USL: ", sl, rvu, sl_sf),
-                   print_val("",  t_exp[rl_index, wcsl_model_name], rvu,
-                             rl_sf[rl_index], suffix = " "),
-                   print_val("", wc_icpt[rl_index], rvu, rl_sf[rl_index],
-                             suffix = " "),
-                   ifelse(plot_option %in% "lean2",
-                          print_val("", poi_woca, "",
-                                    get_n_whole_part(poi_woca) + 1),
-                          print_val("", poi_woca, "",
-                                    get_n_whole_part(poi_woca) + 1,
-                                    suffix = "\n(worst case scenario)")),
-                   ifelse(plot_option %in% "lean2",
-                          print_val("", poi_model, "",
-                                    get_n_whole_part(poi_model) + 1),
-                          print_val("", poi_model, "",
-                                    get_n_whole_part(poi_model) + 1,
-                                    suffix = "\n(standard scenario)")),
-                   print_val("URL: ", t_exp[rl_index, "Rel.Spec"], rvu,
-                             rl_sf[rl_index])),
-               Colour = c("black", "red", "royalblue", "forestgreen", "grey50",
-                          "grey0"),
-               stringsAsFactors = FALSE)
-             d_text$Response <- d_text$Response +
-               c(diff(y_breaks[1:2]), 0, 0,
-                 rep(diff(y_breaks[1:2]), 2),
-                 diff(y_breaks[1:2])) * 1 / c(10, 1, 1, 2, 2, 10)
-           })
-  }
-
-  if (sum(xform %in% "no") == 2) {
-    colnames(d_text) <- c(time_vbl, response_vbl, "Label", "Colour")
-  }
-  if (sum(xform %in% "no") == 0) {
-    colnames(d_text) <- c(old_time_vbl, old_response_vbl, "Label", "Colour")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      colnames(d_text) <- c(old_time_vbl, response_vbl, "Label", "Colour")
-    }
-    if (xform[2] != "no") {
-      colnames(d_text) <- c(time_vbl, old_response_vbl, "Label", "Colour")
-    }
-  }
-
-  # If plot_option is "full": plot the complete information.
-  # If plot_option is "lean1" or "lean2": plot LRL or URL, USL and / or LSL,
-  # worst case and standard scenario.
-  # If plot_option is "basic1" or "basic2": plot USL and / or LSL.
-  switch(plot_option,
-         "full" = {
-           show_text <- rep(TRUE, nrow(d_text))
-         },
-         "lean1" = {
-           show_text <- d_text$Colour %in% c("black", "forestgreen", "grey50")
-         },
-         "lean2" = {
-           show_text <- d_text$Colour %in% c("black", "forestgreen", "grey50")
-         },
-         "basic1" = {
-           show_text <- d_text$Colour %in% c("black")
-         },
-         "basic2" = {
-           show_text <- rep(FALSE, nrow(d_text))
-         })
+  d_text <- get_text_annotation(model = expob, rvu = rvu, x_range = x_range,
+                                y_range = y_range, rl_index = rl_index,
+                                plot_option = plot_option, mtbs = mtbs)
 
   # <-><-><->
   # d_hlines - display of horizontal lines
 
-  if (length(sl) == 2) {
-    d_hlines <- data.frame(Response = sl,
-                           Item = c("LSL", "USL"),
-                           Colour = as.character(c("black", "black")),
-                           Type = as.character(c("dotted", "dotted")),
-                           stringsAsFactors = FALSE)
-  } else {
-    switch(ivl_side,
-           "lower" = {
-             d_hlines <-
-               data.frame(Response = sl,
-                          Item = c("LSL"),
-                          Colour = as.character(c("black")),
-                          Type = as.character(c("dotted")),
-                          stringsAsFactors = FALSE)
-           },
-           "upper" = {
-             d_hlines <-
-               data.frame(Response = sl,
-                          Item = c("USL"),
-                          Colour = as.character(c("black")),
-                          Type = as.character(c("dotted")),
-                          stringsAsFactors = FALSE)
-           })
-  }
-
-  if (xform[2] != "no") {
-    colnames(d_hlines) <- c(old_response_vbl, "Item", "Colour", "Type")
-  } else {
-    colnames(d_hlines) <- c(response_vbl, "Item", "Colour", "Type")
-  }
+  d_hlines <- get_hlines(model = expob)
 
   # <-><-><->
   # d_vlines - display of vertical lines
 
-  d_vlines <- data.frame(Month = c(poi_woca, poi_model),
-                         Item = c("poi.woca", "poi.model"),
-                         Colour = c("forestgreen", "grey50"),
-                         Type = c("dashed", "dotdash"),
-                         stringsAsFactors = FALSE)
-
-  if (xform[1] != "no") {
-    colnames(d_vlines) <- c(old_time_vbl, "Item", "Colour", "Type")
-  } else {
-    colnames(d_vlines) <- c(time_vbl, "Item", "Colour", "Type")
-  }
+  d_vlines <- get_vlines(model = expob, rl_index = rl_index, mtbs = mtbs)
 
   # <-><-><->
   # d_seg - display of segments explaining the TGA method
@@ -1247,233 +660,69 @@ plot_expirest_wisle <- function(
   # Maximal allowed difference over time from intercept (vertical)
   # The elements of d_seg are not displayed if plot_option is "basic".
 
-  if (length(sl) == 2) {
-    switch(ivl_side,
-           "lower" = {
-             d_seg <- data.frame(
-               Time.1 =
-                 c(0, 0,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-               Time.2 =
-                 c(poi_woca, x_range[2],
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-               Response.1 =
-                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], sl[1],
-                   t_exp[rl_index, wcsl_model_name]),
-               Response.2 =
-                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], rl[rl_index],
-                   wc_icpt[rl_index]),
-               Item = c("x.delta", "x.delta.shifted", "y.delta",
-                        "y.delta.shifted"),
-               Colour = c("red", "grey0", "grey50", "grey50"),
-               Type = c("dashed", "dotted", rep("solid", 2)),
-               Size = c(rep(0.5, 2), rep(1, 2)),
-               stringsAsFactors = FALSE)
-           },
-           "upper" = {
-             d_seg <- data.frame(
-               Time.1 =
-                 c(0, 0,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-               Time.2 =
-                 c(poi_woca, x_range[2],
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                   -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-               Response.1 =
-                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], sl[2],
-                   t_exp[rl_index, wcsl_model_name]),
-               Response.2 =
-                 c(t_exp[rl_index, wcsl_model_name], rl[rl_index], rl[rl_index],
-                   wc_icpt[rl_index]),
-               Item = c("x.delta", "x.delta.shifted", "y.delta",
-                        "y.delta.shifted"),
-               Colour = c("red", "grey0", "grey50", "grey50"),
-               Type = c("dashed", "dotted", rep("solid", 2)),
-               Size = c(rep(0.5, 2), rep(1, 2)),
-               stringsAsFactors = FALSE)
-           })
-  } else {
-    d_seg <- data.frame(
-      Time.1 = c(0, 0,
-                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-      Time.2 = c(poi_woca, x_range[2],
-                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 3,
-                 -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9),
-      Response.1 =
-        c(t_exp[rl_index, wcsl_model_name], rl[rl_index], sl,
-          t_exp[rl_index, wcsl_model_name]),
-      Response.2 =
-        c(t_exp[rl_index, wcsl_model_name], rl[rl_index], rl[rl_index],
-          wc_icpt[rl_index]),
-      Item = c("x.delta", "x.delta.shifted", "y.delta", "y.delta.shifted"),
-      Colour = c("red", "grey0", "grey50", "grey50"),
-      Type = c("dashed", "dotted", rep("solid", 2)),
-      Size = c(rep(0.5, 2), rep(1, 2)),
-      stringsAsFactors = FALSE)
-  }
-
-  if (sum(xform %in% "no") == 2) {
-    colnames(d_seg) <- c(paste(time_vbl, 1:2, sep = "."),
-                         paste(response_vbl, 1:2, sep = "."),
-                         "Item", "Colour", "Type", "Size")
-  }
-  if (sum(xform %in% "no") == 0) {
-    colnames(d_seg) <- c(paste(old_time_vbl, 1:2, sep = "."),
-                         paste(old_response_vbl, 1:2, sep = "."),
-                         "Item", "Colour", "Type", "Size")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      colnames(d_seg) <- c(paste(old_time_vbl, 1:2, sep = "."),
-                           paste(response_vbl, 1:2, sep = "."),
-                           "Item", "Colour", "Type", "Size")
-    }
-    if (xform[2] != "no") {
-      colnames(d_seg) <- c(paste(time_vbl, 1:2, sep = "."),
-                           paste(old_response_vbl, 1:2, sep = "."),
-                           "Item", "Colour", "Type", "Size")
-    }
-  }
-
-  # If plot_option is "full": plot the complete information.
-  # If plot_option is "lean1" or "lean2": do not plot vertical grey segments.
-  # If plot_option is "basic1" or "basic2": no segments are plotted (and thus
-  # the object show_seg is not needed.
-  if (plot_option == "full") {
-    show_seg <- rep(TRUE, nrow(d_seg))
-  }
-
-  if (plot_option %in% c("lean1", "lean2")) {
-    show_seg <- d_seg$Colour != "grey50"
-  }
+  d_seg <- get_segments(model = expob, x_range = x_range, rl_index = rl_index,
+                        mtbs = mtbs)
 
   # <-><-><->
   # d_arr - display of arrow explaining the TGA method
   # The elements of d_arr are not displayed if plot_option is not "full".
 
-  if (length(sl) == 2) {
-    switch(ivl_side,
-           "lower" = {
-             d_arr <- data.frame(
-               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
-               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
-               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
-                                 wc_icpt[rl_index]) / 2),
-               Response.2 = c((sl[1] + rl[rl_index]) / 2),
-               Item = c("arrow"),
-               Colour = c("grey50"),
-               Line.Type = c("solid"),
-               Arrow.Type = c("closed"),
-               Size = 0.5,
-               Curvature = 0.5,
-               Angle = 90,
-               Length = ceiling(log2(x_range[2])),
-               stringsAsFactors = FALSE)
-           },
-           "upper" = {
-             d_arr <- data.frame(
-               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
-               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
-               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
-                                 wc_icpt[rl_index]) / 2),
-               Response.2 = c((sl[2] + rl[rl_index]) / 2),
-               Item = c("arrow"),
-               Colour = c("grey50"),
-               Line.Type = c("solid"),
-               Arrow.Type = c("closed"),
-               Size = 0.5,
-               Curvature = -0.5,
-               Angle = 90,
-               Length = ceiling(log2(x_range[2])),
-               stringsAsFactors = FALSE)
-           })
-  } else {
-    switch(ivl_side,
-           "lower" = {
-             d_arr <- data.frame(
-               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
-               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
-               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
-                                 wc_icpt[rl_index]) / 2),
-               Response.2 = c((sl + rl[rl_index]) / 2),
-               Item = c("arrow"),
-               Colour = c("grey50"),
-               Line.Type = c("solid"),
-               Arrow.Type = c("closed"),
-               Size = 0.5,
-               Curvature = 0.5,
-               Angle = 90,
-               Length = ceiling(log2(x_range[2])),
-               stringsAsFactors = FALSE)
-           },
-           "upper" = {
-             d_arr <- data.frame(
-               Time.1 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 9,
-               Time.2 = -round(sqrt(t_exp[rl_index, sl_model_name]) / 3, 0) / 2,
-               Response.1 = c((t_exp[rl_index, wcsl_model_name] +
-                                 wc_icpt[rl_index]) / 2),
-               Response.2 = c((sl + rl[rl_index]) / 2),
-               Item = c("arrow"),
-               Colour = c("grey50"),
-               Line.Type = c("solid"),
-               Arrow.Type = c("closed"),
-               Size = 0.5,
-               Curvature = -0.5,
-               Angle = 90,
-               Length = ceiling(log2(x_range[2])),
-               stringsAsFactors = FALSE)
-           })
-  }
+  d_arr <- get_arrow(model = expob, x_range = x_range, rl_index = rl_index,
+                     mtbs = mtbs)
 
-  if (sum(xform %in% "no") == 2) {
-    colnames(d_arr) <- c(paste(time_vbl, 1:2, sep = "."),
-                         paste(response_vbl, 1:2, sep = "."),
-                         "Item", "Colour", "Line.Type", "Arrow.Type",
-                         "Size", "Curvature", "Angle", "Length")
-  }
-  if (sum(xform %in% "no") == 0) {
-    colnames(d_arr) <- c(paste(old_time_vbl, 1:2, sep = "."),
-                         paste(old_response_vbl, 1:2, sep = "."),
-                         "Item", "Colour", "Line.Type", "Arrow.Type",
-                         "Size", "Curvature", "Angle", "Length")
-  }
-  if (sum(xform %in% "no") == 1) {
-    if (xform[1] != "no") {
-      colnames(d_arr) <- c(paste(old_time_vbl, 1:2, sep = "."),
-                           paste(response_vbl, 1:2, sep = "."),
-                           "Item", "Colour", "Line.Type", "Arrow.Type",
-                           "Size", "Curvature", "Angle", "Length")
-    }
-    if (xform[2] != "no") {
-      colnames(d_arr) <- c(paste(time_vbl, 1:2, sep = "."),
-                           paste(old_response_vbl, 1:2, sep = "."),
-                           "Item", "Colour", "Line.Type", "Arrow.Type",
-                           "Size", "Curvature", "Angle", "Length")
-    }
-  }
+  # <-><-><->
+  # Determination of items to be shown depending on plot_option
+
+  # If plot_option is "full": plot the complete information.
+  # If plot_option is "lean1" or "lean2":
+  # - Plot LRL or URL, USL and / or LSL, worst case and standard scenario.
+  # -  Do not plot vertical grey segments.
+  # If plot_option is "basic1" or "basic2":
+  # - Plot USL and / or LSL.
+  # - Do not show segments (no need for show_seg at all)
+
+  switch(plot_option,
+         "full" = {
+           show_text <- rep(TRUE, nrow(d_text))
+           show_seg <- rep(TRUE, nrow(d_seg))
+         },
+         "lean1" = {
+           show_text <- d_text$Colour %in% c("black", "forestgreen", "grey50")
+           show_seg <- d_seg$Colour != "grey50"
+         },
+         "lean2" = {
+           show_text <- d_text$Colour %in% c("black", "forestgreen", "grey50")
+           show_seg <- d_seg$Colour != "grey50"
+         },
+         "basic1" = {
+           show_text <- d_text$Colour %in% c("black")
+         },
+         "basic2" = {
+           show_text <- rep(FALSE, nrow(d_text))
+         })
 
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Generation of ggplot object
 
-  # Resetting time_vbl and response_vbl, if necessary
+  # Setting variable names
+  time_vbl <- expob[["Variables"]][["time"]]
+  response_vbl <- expob[["Variables"]][["response"]]
+  batch_vbl <- expob[["Variables"]][["batch"]]
+
   if (sum(xform %in% "no") == 0) {
-    time_vbl <- old_time_vbl
-    response_vbl <- old_response_vbl
+    time_vbl <- expob[["Variables"]][["time.orig"]]
+    response_vbl <- expob[["Variables"]][["response.orig"]]
   }
   if (sum(xform %in% "no") == 1) {
     if (xform[1] != "no") {
-      time_vbl <- old_time_vbl
+      time_vbl <- expob[["Variables"]][["time.orig"]]
     }
     if (xform[2] != "no") {
-      response_vbl <- old_response_vbl
+      response_vbl <- expob[["Variables"]][["response.orig"]]
     }
   }
 
-  if (show_grouping == "no") {
+  if (model_name == "cics") {
     ggraph <- ggplot(d_dat,
                      aes(x = .data[[time_vbl]], y = .data[[response_vbl]])) +
       geom_point(size = 2, shape = 1) +
@@ -1526,7 +775,7 @@ plot_expirest_wisle <- function(
                                fill = .data[[batch_vbl]]), alpha = 0.25)
            })
 
-    ggraph <- ggraph + theme(legend.position = c(0.04, 0.96),
+    ggraph <- ggraph + theme(legend.position.inside = c(0.04, 0.96),
                              legend.justification = c(0.1, 1),
                              legend.text = element_text(size = 11),
                              legend.title = element_blank(),
@@ -1538,8 +787,7 @@ plot_expirest_wisle <- function(
   ggraph <- ggraph +
     geom_hline(yintercept = d_hlines[, response_vbl],
                colour = d_hlines$Colour, linetype = d_hlines$Type) +
-    scale_x_continuous(limits = x_range, breaks = x_breaks) +
-    scale_y_continuous(limits = y_range, breaks = y_breaks) +
+    coord_cartesian(xlim = x_range, ylim = y_range) +
     theme_bw()  +
     theme(panel.grid.major = element_line(colour = "grey90"),
           panel.grid.minor = element_blank(),
@@ -1589,7 +837,7 @@ plot_expirest_wisle <- function(
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # Collecting the results
 
-  invisible(structure(list(Model = model,
+  invisible(structure(list(Model = expob[["Models"]][[model_name]],
                            Expiry = t_exp,
                            Graph = ggraph,
                            Prediction = d_pred,

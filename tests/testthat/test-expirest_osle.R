@@ -24,10 +24,10 @@ test_that("expirest_osle_results_match_LeBlond_2011", {
                     100.566878981)
   expect_equivalent(signif(re[["Models"]][["cics"]]$coefficients[2], 12),
                     -0.192993630573)
-  expect_equal(signif(c(stats::anova(re[["Models"]][["dids"]],
+  expect_equal(signif(c(stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]],
                                      re[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]])[2, "F"]), 12),
                c(0.435993484727, 0.228684731019))
   expect_equivalent(
@@ -62,10 +62,10 @@ test_that("expirest_osle_results_match_LeBlond_2011", {
                     c(102.175653109, 104.255189423, 100.820021871))
   expect_equivalent(signif(re[["Models"]][["dics"]]$coefficients[4], 12),
                     -0.213120866465)
-  expect_equal(signif(c(stats::anova(re[["Models"]][["dids"]],
+  expect_equal(signif(c(stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]],
                                      re[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]])[2, "F"]), 12),
                c(21.7380213596, 0.183108926252))
   expect_equivalent(
@@ -101,18 +101,19 @@ test_that("expirest_osle_results_match_LeBlond_2011", {
   expect_equivalent(signif(re[["POI"]]["dids"], 12), 15.8448655130)
   expect_equivalent(signif(re[["Intercepts"]][["dids"]]$icpt, 12),
                     c(104.070645793, 100.781872268, 101.259375000))
-  expect_equivalent(signif(c(re[["Models"]][["dids"]]$coefficients[4],
-                             re[["Models"]][["dids"]]$coefficients[4] +
-                               re[["Models"]][["dids"]]$coefficients[5:6]), 12),
+  expect_equivalent(signif(
+    c(re[["Models"]][["dids.pmse"]]$coefficients[4],
+      re[["Models"]][["dids.pmse"]]$coefficients[4] +
+        re[["Models"]][["dids.pmse"]]$coefficients[5:6]), 12),
                     c(-0.196151337247, -0.208608547839, -0.330208333333))
-  expect_equal(signif(c(stats::anova(re[["Models"]][["dids"]],
+  expect_equal(signif(c(stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]],
                                      re[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]])[2, "F"]), 12),
                c(72.1242158003, 1.95541944320))
   expect_equivalent(
-    signif(summary(re[["Models"]][["dids"]])[["fstatistic"]][1], 12),
+    signif(summary(re[["Models"]][["dids.pmse"]])[["fstatistic"]][1], 12),
     49.8306556826)
 
   # Results presented in LeBlond 2011
@@ -151,18 +152,19 @@ test_that("expirest_osle_results_match_LeBlond_2011", {
   expect_equivalent(signif(re[["POI"]]["dids"], 12), 15.8448655130)
   expect_equivalent(signif(re[["Intercepts"]][["dids"]]$icpt, 12),
                     c(0.027880626223, 0.126543831957, 0.112218750000))
-  expect_equivalent(signif(c(re[["Models"]][["dids"]]$coefficients[4],
-                             re[["Models"]][["dids"]]$coefficients[4] +
-                               re[["Models"]][["dids"]]$coefficients[5:6]), 12),
+  expect_equivalent(signif(
+    c(re[["Models"]][["dids.pmse"]]$coefficients[4],
+      re[["Models"]][["dids.pmse"]]$coefficients[4] +
+        re[["Models"]][["dids.pmse"]]$coefficients[5:6]), 12),
                     c(0.005884540117, 0.006258256435, 0.009906250000))
-  expect_equal(signif(c(stats::anova(re[["Models"]][["dids"]],
+  expect_equal(signif(c(stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]],
                                      re[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]])[2, "F"]), 12),
                c(72.1242158003, 1.95541944320))
   expect_equivalent(
-    signif(summary(re[["Models"]][["dids"]])[["fstatistic"]][1], 12),
+    signif(summary(re[["Models"]][["dids.pmse"]])[["fstatistic"]][1], 12),
     49.8306556826)
 
   # Results presented in LeBlond 2011
@@ -203,10 +205,10 @@ test_that("expirest_osle_results_match_LeBlond_2011", {
                     2.45678204711)
   expect_equivalent(signif(reu[["Models"]][["cics"]]$coefficients[2], 12),
                     0.002272338514)
-  expect_equal(signif(c(stats::anova(reu[["Models"]][["dids"]],
+  expect_equal(signif(c(stats::anova(reu[["Models"]][["dids.pmse"]],
                                      reu[["Models"]][["dics"]],
                                      reu[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(reu[["Models"]][["dids"]],
+                        stats::anova(reu[["Models"]][["dids.pmse"]],
                                      reu[["Models"]][["dics"]])[2, "F"]), 12),
                c(0.353853883257, 0.748152729736))
   expect_equivalent(
@@ -246,7 +248,6 @@ test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_
                   ivl_side = "lower")
 
   r_mod <- stats::lm(Conc ~ Month * Batch, data = exp4)
-  usl <- 105
   lsl <- 95
 
   tmp <- find_poi(srch_range = c(0, 500), model = r_mod, sl = lsl,
@@ -257,15 +258,16 @@ test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_
 
   expect_is(re, "expirest_osle")
   expect_equal(re[["Model.Type"]]$type.acronym, "dics")
-  expect_equivalent(re$wc.batch, 2)
+  expect_equivalent(re$wc.batch["dics"], 2)
   expect_equivalent(signif(re[["POI"]], 12),
-                    c(29.9856687174, 23.4750503440, 23.1159717387))
-  expect_equal(signif(c(stats::anova(re[["Models"]][["dids"]],
+                    c(29.9856687174, 23.4750503440,
+                      23.2441996167, 23.1159717387))
+  expect_equal(signif(c(stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["cics"]])[2, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]],
                                      re[["Models"]][["cics"]])[3, "F"],
-                        stats::anova(re[["Models"]][["dids"]],
+                        stats::anova(re[["Models"]][["dids.pmse"]],
                                      re[["Models"]][["dics"]])[2, "F"]), 12),
                c(10.1083606518, 19.8876404032, 0.329080900382))
 
@@ -281,11 +283,12 @@ test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_
   expect_equivalent(signif(re[["Intercepts"]][["dids"]]$icpt, 12),
                     c(101.817460317, 100.249139280, 102.384126984,
                       104.070645793))
-  expect_equivalent(signif(c(re[["Models"]][["dids"]]$coefficients[5],
-                             re[["Models"]][["dids"]]$coefficients[5] +
-                               re[["Models"]][["dids"]]$coefficients[6:8]), 12),
-                    c(-0.200634920635, -0.180125195618153, -0.233968253968254,
-                      -0.196151337247228))
+  expect_equivalent(signif(
+    c(re[["Models"]][["dids.pmse"]]$coefficients[5],
+      re[["Models"]][["dids.pmse"]]$coefficients[5] +
+        re[["Models"]][["dids.pmse"]]$coefficients[6:8]), 12),
+    c(-0.200634920635,
+      -0.180125195618153, -0.233968253968254, -0.196151337247228))
 
   # Transcription of results shown in Figure 6.27 Stability Models
   # The best model accepted at the significance level of 0.25 has Different
@@ -349,7 +352,7 @@ test_that("expirest_osle_results_match_JMP_reliability_and_survival_methods_
   # Slope	     4_14                -0.19615
 })
 
-test_that("expirest_osle_succeeds_for_poi", {
+test_that("expirest_osle_estimation_succeeds_for_poi", {
   usl <- 4.5
   lsl <- 0.5
 
@@ -421,7 +424,7 @@ test_that("expirest_osle_succeeds_for_poi", {
                  95.4652197782, 79.6924982370, 82.6037890116, 67.2979863914))
 })
 
-test_that("expirest_osle_succeeds_with_transformations", {
+test_that("expirest_osle_estimation_succeeds_with_transformations", {
   tmp <- rep(NA, 7)
 
   # <-><-><-><->
@@ -489,34 +492,75 @@ test_that("expirest_osle_succeeds_with_transformations", {
                  31.8950504925, 37.1116679193, 33.9520528257))
 })
 
-test_that("expirest_osle_succeeds_for_model_type", {
+test_that("expirest_osle_estimation_succeeds_with_a_single_batch", {
+  tmp <- rep(NA, 4)
+
+  # <-><-><-><->
+
+  tmp[1] <-
+    expirest_osle(
+      data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", sl = 0.5, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "lower")[["POI"]]["dids"]
+  tmp[2] <-
+    expirest_osle(
+      data = exp3[exp3$Batch == "b2", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", sl = 0.5, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "lower")[["POI"]]["dids"]
+  tmp[3] <-
+    expirest_osle(
+      data = exp3[exp3$Batch == "b3", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", sl = 0.5, sl_sf = 2,
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "confidence", ivl_type = "one.sided",
+      ivl_side = "lower")[["POI"]]["dids"]
+  tmp[4] <-
+    expirest_osle(
+      data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+      time_vbl = "Month", batch_vbl = "Batch", sl = c(0.5, 4.5),
+      sl_sf = c(2, 2), srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+      ivl = "confidence", ivl_type = "two.sided",
+      ivl_side = "both")[["POI"]]["dids"]
+
+  # <-><-><-><->
+
+  expect_equal(signif(tmp, 12),
+               c(50.0621475632, 43.7101461304, 199.8917947989, 41.1584877869))
+})
+
+test_that("expirest_osle_estimation_succeeds_for_model_type", {
   t_dat1 <- exp1[exp1$Batch %in% c("b2", "b5", "b7"), ]
   t_dat2 <- exp1[exp1$Batch %in% c("b3", "b4", "b5"), ]
   t_dat3 <- exp1[exp1$Batch %in% c("b4", "b5", "b8"), ]
-
-  usl <- 105
-  lsl <- 95
 
   # <-><-><-><->
 
   r_ret1 <-
     expirest_osle(
       data = t_dat1, response_vbl = "Potency", time_vbl = "Month",
-      batch_vbl = "Batch", sl = lsl, sl_sf = 3, srch_range = c(0, 500),
+      batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500),
       alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
       shift = c(0, 0), sf_option = "tight", ivl = "confidence",
       ivl_type = "one.sided", ivl_side = "lower")
   r_ret2 <-
     expirest_osle(
       data = t_dat2, response_vbl = "Potency", time_vbl = "Month",
-      batch_vbl = "Batch", sl = lsl, sl_sf = 3, srch_range = c(0, 500),
+      batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500),
       alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
       shift = c(0, 0), sf_option = "tight", ivl = "confidence",
       ivl_type = "one.sided", ivl_side = "lower")
   r_ret3 <-
     expirest_osle(
       data = t_dat3, response_vbl = "Potency", time_vbl = "Month",
-      batch_vbl = "Batch", sl = lsl, sl_sf = 3, srch_range = c(0, 500),
+      batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500),
       alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
       shift = c(0, 0), sf_option = "tight", ivl = "confidence",
       ivl_type = "one.sided", ivl_side = "lower")
@@ -586,14 +630,9 @@ test_that("expirest_osle_succeeds_for_variables", {
 })
 
 test_that("expirest_osle_warns", {
-  usl <- 3.5
-  lsl <- 1.5
-
-  # <-><-><-><->
-
   expect_warning(
     expirest_osle(data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-                  batch_vbl = "Batch", sl = lsl, sl_sf = 2,
+                  batch_vbl = "Batch", sl = 1.5, sl_sf = 2,
                   srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
                   xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
                   ivl = "prediction", ivl_type = "one.sided",
@@ -601,12 +640,37 @@ test_that("expirest_osle_warns", {
     "Not for all model types POI values obtained.")
   expect_warning(
     expirest_osle(data = exp3, response_vbl = "Moisture", time_vbl = "Month",
-                  batch_vbl = "Batch", sl = lsl, sl_sf = 2,
+                  batch_vbl = "Batch", sl = 1.5, sl_sf = 2,
+                  srch_range = c(5, 500), alpha = 0.05, alpha_pool = 0.25,
+                  xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+                  ivl = "prediction", ivl_type = "one.sided",
+                  ivl_side = "lower"),
+    "Not for all model types POI values obtained.")
+  expect_warning(
+    expirest_osle(data = exp3, response_vbl = "Moisture", time_vbl = "Month",
+                  batch_vbl = "Batch", sl = c(1.5, 3.5), sl_sf = c(2, 2),
+                  srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+                  xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+                  ivl = "prediction", ivl_type = "two.sided",
+                  ivl_side = "both"),
+    "Not for all model types POI values obtained.")
+
+  expect_warning(
+    expirest_osle(data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+                  time_vbl = "Month", batch_vbl = "Batch", sl = 1.5, sl_sf = 2,
                   srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
                   xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
                   ivl = "prediction", ivl_type = "one.sided",
-                  ivl_side = "upper"),
-    "Not for all model types POI values obtained.")
+                  ivl_side = "lower"),
+    "No POI value was obtained.")
+  expect_warning(
+    expirest_osle(data = exp3[exp3$Batch == "b1", ], response_vbl = "Moisture",
+                  time_vbl = "Month", batch_vbl = "Batch", sl = 1.5, sl_sf = 2,
+                  srch_range = c(5, 500), alpha = 0.05, alpha_pool = 0.25,
+                  xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+                  ivl = "prediction", ivl_type = "one.sided",
+                  ivl_side = "lower"),
+    "No POI value was obtained.")
 
   expect_warning(
     expirest_osle(data = exp3, response_vbl = "Moisture", time_vbl = "Month",
@@ -640,6 +704,15 @@ test_that("expirest_osle_warns", {
                   ivl = "confidence", ivl_type = "one.sided",
                   ivl_side = "lower"),
     "You specified ivl_side = \"lower\".")
+  expect_warning(
+    expirest_osle(data = exp3, response_vbl = "Moisture", time_vbl = "Month",
+                  batch_vbl = "Batch", sl = c(1.5, 3.5), sl_sf = c(2, 2),
+                  srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+                  xform = c("no", "no"), shift = c(0, 0), sf_option = "tight",
+                  ivl = "confidence", ivl_type = "one.sided",
+                  ivl_side = "both"),
+    "ivl_side is specified as \"both\" "
+  )
 })
 
 test_that("expirest_osle_fails_with_warning_tight_spec_limits", {
@@ -971,5 +1044,22 @@ test_that("expirest_osle_fails_with_error", {
       alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
       shift = c(0, 0), sf_option = "loose", ivl = "confidence",
       ivl_type = "one.sided", ivl_side = "incorrect"),
-    "specify ivl_side either as \"lower\" or \"upper\"")
+    "specify ivl_side either as \"lower\", \"upper\" or \"both\"")
+  expect_error(
+    expirest_osle(
+      data = t_dat, response_vbl = "Potency", time_vbl = "Month",
+      batch_vbl = "Batch", sl = 95, sl_sf = 3, srch_range = c(0, 500),
+      alpha = 0.05, alpha_pool = 0.25, xform = c("no", "no"),
+      shift = c(0, 0), sf_option = "loose", ivl = "confidence",
+      ivl_type = "one.sided", ivl_side = "both"),
+    "Please provide a specification with two sides.")
+  expect_error(
+    expirest_osle(
+      data = t_dat, response_vbl = "Potency", time_vbl = "Month",
+      batch_vbl = "Batch", sl = c(95, 105), sl_sf = c(3, 3),
+      srch_range = c(0, 500), alpha = 0.05, alpha_pool = 0.25,
+      xform = c("no", "no"), shift = c(0, 0), sf_option = "loose",
+      ivl = "confidence", ivl_type = "two.sided", ivl_side = "both",
+      rl = c(100, 99, 08)),
+    "ivl_side must be either \"lower\" or \"upper\"")
 })
