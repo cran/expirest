@@ -21,6 +21,7 @@
 #' @importFrom stats predict
 #'
 #' @keywords internal
+#' @noRd
 
 get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
                          ivl_type = "one.sided", ivl_side = "lower") {
@@ -195,6 +196,7 @@ get_intvl_limit <- function(x_new, model, alpha = 0.05, ivl = "confidence",
 #' \code{\link[stats]{lm}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_distance <- function(x_new, model, sl, mode = "minimal", alpha = 0.05,
                          ivl = "confidence", ivl_type = "one.sided",
@@ -291,6 +293,7 @@ get_distance <- function(x_new, model, sl, mode = "minimal", alpha = 0.05,
 #' @importFrom stats setNames
 #'
 #' @keywords internal
+#' @noRd
 
 find_poi <- function(srch_range, model, sl, mode = "minimal", alpha = 0.05,
                      ivl = "confidence", ivl_type = "one.sided",
@@ -342,7 +345,7 @@ find_poi <- function(srch_range, model, sl, mode = "minimal", alpha = 0.05,
                    ivl_side = ivl_side)
     res <- setNames(rep(NA, length(t_dist)), names(t_dist))
 
-    for(i in seq_along(t_dist)) {
+    for (i in seq_along(t_dist)) {
       tmp <- try_get_model(
         uniroot(f = function(x, ii, ...) get_distance(x_new = x, ...)[ii],
                 interval = srch_range, ii = i, model = model, sl = sl,
@@ -403,6 +406,7 @@ find_poi <- function(srch_range, model, sl, mode = "minimal", alpha = 0.05,
 #' \code{\link[stats]{uniroot}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_poi_list <- function(data, batch_vbl, model_list, sl, srch_range,
                          mode = "minimal", alpha = 0.05, ivl = "confidence",
@@ -530,6 +534,7 @@ get_poi_list <- function(data, batch_vbl, model_list, sl, srch_range,
 #' @importFrom stats formula
 #'
 #' @keywords internal
+#' @noRd
 
 get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
                      xform = c("no", "no"), shift = c(0, 0)) {
@@ -652,6 +657,7 @@ get_icpt <- function(model, response_vbl, time_vbl, batch_vbl,
 #' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_icpt_list <- function(data, response_vbl, time_vbl, batch_vbl, model_list,
                           xform = c("no", "no"), shift = c(0, 0)) {
@@ -797,6 +803,7 @@ get_icpt_list <- function(data, response_vbl, time_vbl, batch_vbl, model_list,
 #' \code{\link{get_wisle_poi_list}}, \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
                           shift = c(0, 0), ivl_side = "lower") {
@@ -919,6 +926,7 @@ get_wcs_limit <- function(rl, sl, intercept, xform = c("no", "no"),
 #' @importFrom stats setNames
 #'
 #' @keywords internal
+#' @noRd
 
 get_wc_icpt <- function(data, batch_vbl, icpt_list, poi_list, wc_batch, xform) {
   if (!is.data.frame(data)) {
@@ -1022,6 +1030,7 @@ get_wc_icpt <- function(data, batch_vbl, icpt_list, poi_list, wc_batch, xform) {
 #' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_xformed_variables <- function(data, response_vbl, time_vbl,
                                   xform = c("no", "no"), shift = c(0, 0)) {
@@ -1123,6 +1132,7 @@ get_xformed_variables <- function(data, response_vbl, time_vbl,
 #' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
                               xform = c("no", "no")) {
@@ -1248,6 +1258,7 @@ get_variable_list <- function(response_vbl, time_vbl, batch_vbl,
 #' @seealso \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
+#' @noRd
 
 set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "tight",
                        xform = c("no", "no"), shift = c(0, 0),
@@ -1454,6 +1465,7 @@ set_limits <- function(rl, rl_sf, sl, sl_sf, sf_option = "tight",
 #' @seealso \code{\link{set_limits}}
 #'
 #' @keywords internal
+#' @noRd
 
 get_relevant_limits <- function(limits_list, xform = c("no", "no"),
                                 ivl_side = "lower") {
@@ -1563,7 +1575,22 @@ get_relevant_limits <- function(limits_list, xform = c("no", "no"),
 #' @details The function \code{check_ancova()} fits an ANCOVA (ANalyis of
 #' COVAriance) model to the data contained in the provided data frame. Based
 #' on \code{alpha}, it checks if the intercepts and/or slopes between the
-#' groups differ significantly or not.
+#' groups differ significantly or not. \cr
+#' Three possible models are regarded as appropriate,
+#' i.e.
+#' \itemize{
+#'  \item a \emph{common intercept / common slope} model (cics),
+#'  \item a \emph{different intercept / common slope} model (dics) or
+#'  \item a \emph{different intercept / different slope} model (dids).
+#' }
+#' The \emph{common intercept / different slope} model (cids) is of limited
+#' practical relevance because the corresponding model is missing an effect.
+#' When slopes exhibit significant differences, comparing intercepts becomes
+#' inconsequential. Moreover, while initial levels of different batches in a
+#' manufacturing process might be relatively well-controlled, it is improbable
+#' that these levels are identical. Consequently, if the model probabilities
+#' associated with the intercepts and slopes suggest the appropriateness of
+#' the cids model, the decision is taken in favour of a dids model.
 #'
 #' @return A list of two elements is returned that specifies which model, based
 #'   on the ANCOVA analysis, suits best. The first element (\code{type.spec})
@@ -1585,6 +1612,7 @@ get_relevant_limits <- function(limits_list, xform = c("no", "no"),
 #' @importFrom stats setNames
 #'
 #' @keywords internal
+#' @noRd
 
 check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
                          alpha = 0.05) {
@@ -1641,6 +1669,19 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 
     ifelse(p_batch > alpha, common_icpt <- 1L, common_icpt <- 0L)
     ifelse(p_interaction > alpha, common_slp <- 1L, common_slp <- 0L)
+
+    # In case of a cids model, set the common_icpt parameter to 0 to obtain
+    # a dids model because the cids model is regarded as not relevant
+    # (See # LeBlond, D., Griffith, D. and Aubuchon, K. Linear Regression 102:
+    # Stability Shelf Life Estimation Using Analysis of Covariance.
+    # J Valid Technol (2011) 17(3): 47-68.)
+
+    if (common_icpt == 1 && common_slp == 0) {
+      common_icpt <- 0
+    }
+
+    # ---------
+    # Compile and return results
 
     l_model_type <-
       list(type.spec = setNames(c(common_icpt, common_slp),
@@ -1712,6 +1753,7 @@ check_ancova <- function(data, response_vbl, time_vbl, batch_vbl,
 #' @importFrom stats setNames
 #'
 #' @keywords internal
+#' @noRd
 
 get_model_list <- function(data, response_vbl, time_vbl, batch_vbl) {
   if (!is.data.frame(data)) {
@@ -1832,6 +1874,7 @@ get_model_list <- function(data, response_vbl, time_vbl, batch_vbl) {
 #' @seealso \code{\link{get_wcs_limit}}.
 #'
 #' @keywords internal
+#' @noRd
 
 extract_from_ll_wcsl <- function(ll, element) {
   if (sum(names(ll) %in% c("cics", "dics", "dids.pmse", "dids")) != 4) {
@@ -1931,6 +1974,7 @@ extract_from_ll_wcsl <- function(ll, element) {
 #' columns corresponding to the length of \code{l1} or \code{l2} is returned.
 #'
 #' @keywords internal
+#' @noRd
 
 extract_wc_x <- function(l1, l2) {
   if (!is.list(l1)) {
@@ -2060,6 +2104,7 @@ extract_wc_x <- function(l1, l2) {
 #' \code{\link{expirest_osle}}, \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_osle_poi_list <- function(data, batch_vbl, icpt_list, model_list, sl,
                               srch_range, alpha = 0.05, xform = c("no", "no"),
@@ -2347,6 +2392,7 @@ get_osle_poi_list <- function(data, batch_vbl, icpt_list, model_list, sl,
 #' \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_wisle_poi_list <- function(icpt_list, model_list, rl, sl, srch_range,
                                alpha = 0.05, xform = c("no", "no"),
@@ -2674,6 +2720,7 @@ get_wisle_poi_list <- function(icpt_list, model_list, rl, sl, srch_range,
 #' \code{\link{expirest_wisle}}.
 #'
 #' @keywords internal
+#' @noRd
 
 compile_wisle_summary <- function(data, batch_vbl, rl, poi_list, icpt_list,
                                   wcsl_list, wcb_list, limits_list, poi_ich,
@@ -2911,6 +2958,7 @@ compile_wisle_summary <- function(data, batch_vbl, rl, poi_list, icpt_list,
 #' \code{\link[base]{formatC}}, \code{\link[base]{paste}}.
 #'
 #' @keywords internal
+#' @noRd
 
 print_val <- function(val_name, val_value, val_unit, val_sf,
                       prefix = "", suffix = "") {
@@ -2982,6 +3030,7 @@ print_val <- function(val_name, val_value, val_unit, val_sf,
 #' \code{\link{get_text_annotation}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_n_whole_part <- function(x) {
   if (!is.numeric(x) && all(!is.na(x))) {
@@ -3023,6 +3072,7 @@ get_n_whole_part <- function(x) {
 #' \code{\link{get_wisle_poi_list}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_n_list_levels <- function(x) {
   if (is.list(x)) {
@@ -3087,6 +3137,7 @@ get_n_list_levels <- function(x) {
 #' \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_text_annotation <- function(model, rvu, x_range, y_range, rl_index = NULL,
                                 plot_option = "full", mtbs = "verified") {
@@ -3419,6 +3470,7 @@ get_text_annotation <- function(model, rvu, x_range, y_range, rl_index = NULL,
 #' \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_hlines <- function(model) {
   if (!inherits(model, "expirest_osle") && !inherits(model, "expirest_wisle")) {
@@ -3512,6 +3564,7 @@ get_hlines <- function(model) {
 #' \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_vlines <- function(model, rl_index = NULL, mtbs = "verified") {
   if (!inherits(model, "expirest_osle") && !inherits(model, "expirest_wisle")) {
@@ -3652,6 +3705,7 @@ get_vlines <- function(model, rl_index = NULL, mtbs = "verified") {
 #' \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_segments <- function(model, x_range, rl_index, mtbs = "verified") {
   if (!inherits(model, "expirest_wisle")) {
@@ -3830,6 +3884,7 @@ get_segments <- function(model, x_range, rl_index, mtbs = "verified") {
 #' \code{\link[ggplot2]{ggplot}}, \code{\link[ggplot2]{geom_text}}.
 #'
 #' @keywords internal
+#' @noRd
 
 get_arrow <- function(model, x_range, rl_index, mtbs = "verified") {
   if (!inherits(model, "expirest_wisle")) {
@@ -4018,6 +4073,7 @@ get_arrow <- function(model, x_range, rl_index, mtbs = "verified") {
 #' @importFrom stats predict
 #'
 #' @keywords internal
+#' @noRd
 
 get_predictions <- function(model, model_name, x_range) {
   if (!inherits(model, "expirest_osle") && !inherits(model, "expirest_wisle")) {

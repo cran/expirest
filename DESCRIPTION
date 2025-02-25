@@ -1,7 +1,7 @@
 Type: Package
 Package: expirest
 Title: Expiry Estimation Procedures
-Version: 0.1.6
+Version: 0.1.7
 Authors@R: c(
     person("Pius", "Dahinden", , "pius.dahinden@tillotts.com", role = c("aut", "cre")),
     person("Tillotts Pharma AG", , , "tillotts@tillotts.com", role = c("cph", "fnd"))
@@ -24,11 +24,11 @@ Suggests: testthat
 Encoding: UTF-8
 Language: en-GB
 LazyData: true
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2024-03-25 16:17:45 UTC; piusd
+Packaged: 2025-02-25 08:13:15 UTC; piusd
 Author: Pius Dahinden [aut, cre],
   Tillotts Pharma AG [cph, fnd]
 Maintainer: Pius Dahinden <pius.dahinden@tillotts.com>
 Repository: CRAN
-Date/Publication: 2024-03-25 16:30:02 UTC
+Date/Publication: 2025-02-25 08:30:02 UTC

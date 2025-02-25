@@ -109,9 +109,14 @@
 #'  \item a \emph{different intercept / common slope} model (dics) or
 #'  \item a \emph{different intercept / different slope} model (dids).
 #' }
-#' The \emph{common intercept / different slope} model is not of practical
-#' relevance because the corresponding model is missing an effect. If the
-#' slopes are significantly different, there is no point comparing intercepts.
+#' The \emph{common intercept / different slope} model (cids) is of limited
+#' practical relevance because the corresponding model is missing an effect.
+#' When slopes exhibit significant differences, comparing intercepts becomes
+#' inconsequential. Moreover, while initial levels of different batches in a
+#' manufacturing process might be relatively well-controlled, it is improbable
+#' that these levels are identical. Consequently, if the model probabilities
+#' associated with the intercepts and slopes suggest the appropriateness of
+#' the cids model, the decision is taken in favour of a dids model.
 #' The dids model has individual intercepts and individual slopes, and the
 #' calculation of confidence intervals is based on the corresponding individual
 #' mean square errors. The \emph{different intercept / different slope} model
@@ -185,8 +190,9 @@
 #' Guideline, Evaluation of Stability Data Q1E, step 4, February 2003
 #' (CPMP/ICH/420/02).
 #'
-#' @seealso \code{\link{expirest_wisle}}, \code{\link[stats]{uniroot}},
-#' \code{\link[stats]{lm}}, \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
+#' @seealso \code{\link{expirest_wisle}}, \code{\link{plot_expirest_wisle}},
+#' \code{\link[stats]{uniroot}}, \code{\link[stats]{lm}},
+#' \code{\link[stats]{AIC}}, \code{\link[stats]{BIC}}.
 #'
 #' @example man/examples/examples_expirest_osle.R
 #'
